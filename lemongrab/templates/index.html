@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>LEMONGRAB</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lemongrab.css') }}">
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+</head>
+<body>
+
+    <!-- Primary Page Layout
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <div class="container">
+    <div class="row">
+        <div class="one-half column" style="margin-top: 10%">
+            <h3>LEMONGRAB</h3>
+
+            <form action="analysis" method="POST">
+
+                <label for="platformDropdown">Platforms</label>
+                <select class="u-full-width" id="platformDropdown" name="platform_dropdown" multiple>
+                    {% for platform in platforms %} 
+                        <option value="{{ platform }}">{{ platform }}</option>
+                    {% endfor %}
+                </select>        
+
+                <label for="countryDropdown">Countries</label>
+                <select class="u-full-width" id="countryDropdown" name="country_dropdown" multiple>
+                    {% for country in countries %} 
+                        <option value="{{ country }}">{{ country.replace("<small>", "").replace("</small>", "") }}</option>
+                    {% endfor %}
+                </select>  
+
+                <input class="button-primary" type="submit" value="Select">
+            </form>
+        </div>
+    </div>
+    </div>
+
+    <!-- End Document
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>

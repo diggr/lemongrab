@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>LEMONGRAB</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lemongrab.css') }}">
+
+    <!-- JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+</head>
+<body>
+
+    <!-- Primary Page Layout
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <div class="container">
+        <div class="row">
+            <div class="ten column" style="margin-top: 10%">
+                <h3>LEMONGRAB</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="one-half column">
+                <h4>Platforms</h4>
+                <ul>
+                    {% for platform in platforms %} 
+                        <li>{{ platform }}</li>
+                    {% endfor %}                    
+                </ul>
+            </div>
+            <div class="one-half column">
+                <h4>Countries</h4>
+                <ul>
+                    {% for country in countries %} 
+                        <li>{{ country }}</li>
+                    {% endfor %}                  
+                </ul>
+            </div>
+        </div>
+
+        <div class="row"  style="margin-top: 5%">
+            Number of companies: {{ companies_n }}
+        </div>
+
+        <div class="row">
+            <canvas id="most_active_companies-chart" width="800" height="450"></canvas>
+            <script type="text/javascript">
+
+                new Chart(document.getElementById("most_active_companies-chart"), {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: [
+                            {% for c in most_common %}
+                                "{{ c[0] }}",
+                            {% endfor %}
+                        ],
+                        datasets: [
+                            {
+                                label: "No. of games",
+                                data: [
+                                    {% for c in most_common %}
+                                        {{ c[1] }},
+                                    {% endfor %}
+                                ]
+                            }
+                        ]                     
+                    },
+                    options: {
+                        legend: { 
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Most active companies'
+                        },
+                    }                   
+                });
+
+            </script>
+        </div>
+
+        <div class="row"  style="margin-top: 5%">
+                Number of companies with country information in Wikidata: {{ companies_with_country }} ( {{ companies_with_country/companies_n }} )
+            </div>
+    
+            <div class="row">
+                <canvas id="country-chart" width="800" height="550"></canvas>
+                <script type="text/javascript">
+                    var randomColorGenerator = function () { 
+                        return '#' + (Math.random().toString(16) + '0000000').slice(2, 8); 
+                    };
+
+    
+                    new Chart(document.getElementById("country-chart"), {
+                        type: 'horizontalBar',
+                        data: {
+                            labels: [
+                                {% for c in company_countries %}
+                                    "{{ c[0] }}",
+                                {% endfor %}
+                            ],
+                            datasets: [
+                                {
+                                    label: "No. of companies",
+                                    data: [
+                                        {% for c in company_countries %}
+                                            {{ c[1] }},
+                                        {% endfor %}
+                                    ],
+                                }
+                            ]                     
+                        },
+                        options: {
+                            legend: { 
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Companies per country'
+                            },
+                        }                   
+                    });
+    
+                </script>
+            </div>        
+
+    </div>
+
+    <!-- End Document
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>
