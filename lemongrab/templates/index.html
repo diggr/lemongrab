@@ -46,7 +46,7 @@
                     {% endfor %}
                 </select>        
 
-                <label for="countryDropdown">Countries</label>
+                <label for="countryDropdown">Release countries</label>
                 <select class="u-full-width" id="countryDropdown" name="country_dropdown" multiple>
                     {% for country in countries %} 
                         <option value="{{ country }}">{{ country.replace("<small>", "").replace("</small>", "") }}</option>

@@ -27,3 +27,4 @@ $ python lemongrab.py <COMMAND>
 | company-dataset | Builds base company dataset with game/release/production role information |
 | wikidata-mapping | Fetches current wikidata mapping (Q-Number <-> Mobygames slug) and country information |
 | company-network | Builds a network of companies based on their common work on games |
+| browser | Opens the lemongrab browser frontend for data exploration |
