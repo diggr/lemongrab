@@ -1,3 +1,5 @@
 __pycache__
-datasets/*
+datasets/*.prov
+datasets/mobygames_companies.json
+datasets/wikidata_mapping.json
 company_networks/*
