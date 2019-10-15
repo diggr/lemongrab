@@ -36,10 +36,10 @@ Builds a network of companies based on their common work on games
 
 | Option | Description | Multiple | Default value | 
 | -- | -- | -- | -- |
-| --country/-c | Release country | X | |
-| --platform/-p | Release platform | X | |
-| --roles/--no-roles | Differentiate companies by their production roles | | --no-roles |
-| --publisher/--no-publisher | Include/exclude publisher roles; only needed when --roles option is set | | --no-publisher |
+| --country/-c | Release country | X | -- |
+| --platform/-p | Release platform | X | -- |
+| --roles/--no-roles | Differentiate companies by their production roles | -- | --no-roles |
+| --publisher/--no-publisher | Include/exclude publisher roles; only needed when --roles option is set | -- | --no-publisher |
 
 # browser 
 
