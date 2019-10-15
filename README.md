@@ -35,7 +35,7 @@ Fetches current wikidata mapping (Q-Number <-> Mobygames slug) and country infor
 Builds a network of companies based on their common work on games
 
 | Option | Description | Multiple | Default value | 
-| -- | -- | -- |
+| -- | -- | -- | -- |
 | --country/-c | Release country | X | |
 | --platform/-p | Release platform | X | |
 | --roles/--no-roles | Differentiate companies by their production roles | | --no-roles |
