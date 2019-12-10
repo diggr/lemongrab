@@ -38,6 +38,7 @@ class CompanyDataset():
                 production_roles.update([ game["production_role"] ])
 
                 games_dataset[game["game_slug"]].append({
+                    "game_title": game["game_title"],
                     "company_name": game["company_name"],
                     "company_country": company_country,
                     "production_role": game["production_role"]

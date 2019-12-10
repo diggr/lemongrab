@@ -226,7 +226,7 @@
                         {% for key, value in games_table.items() %}
                             {% for entry in value %}
                             <tr>
-                                <td>{{ key }}</td>
+                                <td><a href="https://www.mobygames.com/game/{{key}}" target="_new">{{ entry.game_title }}</a></td>
                                 <td>{{ entry.company_name }}</td>
                                 <td>{{ entry.production_role }}</td>
                                 <td>{{ entry.company_country }}</td>
