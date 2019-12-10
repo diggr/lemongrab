@@ -37,7 +37,8 @@ def analysis():
         company_games=data["company_games"],
         company_countries=data["company_countries"],
         companies_with_country=data["companies_with_country"],
-        production_roles=data["production_roles"]
+        production_roles=data["production_roles"],
+        games_table=data["games_table"]
         )
 
 

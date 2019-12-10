@@ -30,6 +30,17 @@
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <link rel="icon" type="image/png" href="images/favicon.png">
 
+
+    <!-- jquery -->
+    <script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>    
+
+    <!-- DATATABLES -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
 </head>
 <body>
 
@@ -195,6 +206,43 @@
     
                 </script>
             </div>  
+
+            <!-- GAMES TABLE -->
+            <div class="row"  style="margin-top: 5%">
+                Games:
+            </div>
+    
+            <div class="row">
+                <table id="games_table", class="display">
+                    <thead>
+                        <tr>
+                            <th>Game</th>
+                            <th>Company</th>
+                            <th>Production role</th>
+                            <th>Company country</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in games_table.items() %}
+                            {% for entry in value %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ entry.company_name }}</td>
+                                <td>{{ entry.production_role }}</td>
+                                <td>{{ entry.company_country }}</td>
+                            </tr>                        
+                            {% endfor %}
+                        {% endfor %}    
+                    </tbody>
+                </table>
+            </div>  
+
+            <script type="text/javascript">  
+                $(document).ready( function () {
+                    $('#games_table').DataTable();
+                } );
+            </script>
+
 
     </div>
 

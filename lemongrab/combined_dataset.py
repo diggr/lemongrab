@@ -8,46 +8,6 @@ SLUG_MAPPING = "datasets/mobygames_companies_id_to_slug.json"
 WIKI_MAPPING = "datasets/wikidata_mapping.json"
 
 class CompanyDataset():
-    """
-    def set_filter(self, platforms, countries):
-
-        self.production_roles = Counter()
-
-        companies_games = defaultdict(set)
-        countries = set(countries)
-        for company_id, games in self.base_dataset.items():
-            
-            platforms_ = set()
-            countries_ = set()
-
-            for game in games:
-                add = False
-                if game["platform"] in platforms or len(platforms) == 0:
-                    #companies.update([ game["company_name"] ])
-                    if len(countries) > 0:
-                        if len(countries.intersection(game["release_countries"])) > 0:
-                            add = True
-                    else:
-                        add = True
-                        
-                if add:
-                    companies_games[ company_id ].update([ game["game_slug"] ])
-                    self.production_roles.update([ game["production_role"] ])
-
-        self.companies = Counter({ self.base_dataset[x][0]["company_name"]: len(y) for x, y in companies_games.items() })
-        self.companies_games = companies_games
-
-        self.countries_acc = defaultdict(set)
-        self.companies_with_country = 0
-        for company_id in self.companies_games.keys():
-            if company_id in self.slug_map:
-                slug = self.slug_map[company_id]
-                if slug in self.country_map:
-                    self.companies_with_country += 1
-                    self.countries_acc[self.country_map[slug]].add(self.base_dataset[company_id][0]["company_name"])
-        
-        self.countries_accumulated = Counter({x: len(y) for x, y in self.countries_acc.items() })
-    """
 
     def get_company_data(self, company_name):
         pass
@@ -64,13 +24,25 @@ class CompanyDataset():
         companies_games = defaultdict(set)
         companies_with_country = 0
         countries_accumulated = Counter()
+        games_dataset = defaultdict(list)
 
         for company_id, games in self.filtered_dataset.items():
-            print(company_id, games)
+            
+            company_country = ""
+            company_slug = self.slug_map[company_id]
+            if company_slug in self.country_map:
+                company_country = self.country_map[company_slug]
+
             for game in games:
                 companies_games[ company_id ].update([ game["game_slug"] ])
                 production_roles.update([ game["production_role"] ])
-            
+
+                games_dataset[game["game_slug"]].append({
+                    "company_name": game["company_name"],
+                    "company_country": company_country,
+                    "production_role": game["production_role"]
+                })
+
         companies = Counter({ self.base_dataset[x][0]["company_name"]: len(y) for x, y in companies_games.items() })
         companies_games = companies_games
 
@@ -85,25 +57,14 @@ class CompanyDataset():
         
         countries_accumulated = Counter({x: len(y) for x, y in countries_acc.items() })        
 
-        """
-        needed return values
-        platforms=platforms, 
-        countries=countries,
-        companies_n=len(dataset.companies),
-        most_common=list(dataset.companies.most_common(30)),
-        company_games=dict(dataset.companies_games),
-        company_countries=list(dataset.countries_accumulated.most_common(200)),
-        companies_with_country=dataset.companies_with_country,
-        production_roles=list(dataset.production_roles.most_common(50))
-        """
-
         return {
             "companies": companies,
             "companies_most_common": list(companies.most_common(30)),
             "company_games": dict(companies_games),
             "company_countries": list(countries_accumulated.most_common(200)),
             "companies_with_country": companies_with_country,
-            "production_roles": list(production_roles.most_common(50))
+            "production_roles": list(production_roles.most_common(50)),
+            "games_table": dict(games_dataset)
         }        
 
         
