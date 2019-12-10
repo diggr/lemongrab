@@ -149,6 +149,53 @@
                 </script>
             </div>        
 
+
+            <div class="row"  style="margin-top: 5%">
+                Production roles:
+            </div>
+    
+            <div class="row">
+                <canvas id="role-chart" width="800" height="550"></canvas>
+                <script type="text/javascript">
+                    var randomColorGenerator = function () { 
+                        return '#' + (Math.random().toString(16) + '0000000').slice(2, 8); 
+                    };
+
+    
+                    new Chart(document.getElementById("role-chart"), {
+                        type: 'horizontalBar',
+                        data: {
+                            labels: [
+                                {% for c in production_roles %}
+                                    "{{ c[0] }}",
+                                {% endfor %}
+                            ],
+                            datasets: [
+                                {
+                                    label: "Mentions",
+                                    data: [
+                                        {% for c in production_roles %}
+                                            {{ c[1] }},
+                                        {% endfor %}
+                                    ],
+                                    backgroundColor: '#ffee00'
+                                }
+                            ]                     
+                        },
+                        options: {
+                            legend: { 
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Production roles (mentions)'
+                            },
+                        }                   
+                    });
+    
+                </script>
+            </div>  
+
     </div>
 
     <!-- End Document

@@ -26,16 +26,18 @@ def analysis():
     platforms = request.form.getlist("platform_dropdown")
     print("set filter->")
     dataset.set_filter(platforms, countries)
-    print(list(dataset.companies.most_common(30)))
+    print("get overview data")
+    data = dataset.get_overview()
     return render_template(
         "analysis.html", 
         platforms=platforms, 
         countries=countries,
-        companies_n=len(dataset.companies),
-        most_common=list(dataset.companies.most_common(30)),
-        company_games=dict(dataset.companies_games),
-        company_countries=list(dataset.countries_accumulated.most_common(200)),
-        companies_with_country=dataset.companies_with_country
+        companies_n=len(data["companies"]),
+        most_common=data["companies_most_common"],
+        company_games=data["company_games"],
+        company_countries=data["company_countries"],
+        companies_with_country=data["companies_with_country"],
+        production_roles=data["production_roles"]
         )
 
 

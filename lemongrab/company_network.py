@@ -211,6 +211,8 @@ class CompanyNetworkBuilder():
         prov.add(
             agents = [PROV_AGENT],
             activity = PROV_ACTIVITY,
-            description = PROV_DESC.format(platforms=self.platform_str(platform), countries=self.countries_str(countries)) 
+            description = PROV_DESC.format(
+                platforms=self.platform_str(platform), 
+                countries=self.countries_str(countries)) 
         )
         prov.save()

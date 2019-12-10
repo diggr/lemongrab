@@ -8,8 +8,11 @@ SLUG_MAPPING = "datasets/mobygames_companies_id_to_slug.json"
 WIKI_MAPPING = "datasets/wikidata_mapping.json"
 
 class CompanyDataset():
-
+    """
     def set_filter(self, platforms, countries):
+
+        self.production_roles = Counter()
+
         companies_games = defaultdict(set)
         countries = set(countries)
         for company_id, games in self.base_dataset.items():
@@ -29,6 +32,7 @@ class CompanyDataset():
                         
                 if add:
                     companies_games[ company_id ].update([ game["game_slug"] ])
+                    self.production_roles.update([ game["production_role"] ])
 
         self.companies = Counter({ self.base_dataset[x][0]["company_name"]: len(y) for x, y in companies_games.items() })
         self.companies_games = companies_games
@@ -43,11 +47,93 @@ class CompanyDataset():
                     self.countries_acc[self.country_map[slug]].add(self.base_dataset[company_id][0]["company_name"])
         
         self.countries_accumulated = Counter({x: len(y) for x, y in self.countries_acc.items() })
+    """
+
+    def get_company_data(self, company_name):
+        pass
+
+    def get_company_country_data(self, company):
+        pass
+
+    def get_production_role_data(self, production_role):
+        pass
+
+    def get_overview(self):
+        production_roles = Counter()
+        companies = Counter()
+        companies_games = defaultdict(set)
+        companies_with_country = 0
+        countries_accumulated = Counter()
+
+        for company_id, games in self.filtered_dataset.items():
+            print(company_id, games)
+            for game in games:
+                companies_games[ company_id ].update([ game["game_slug"] ])
+                production_roles.update([ game["production_role"] ])
+            
+        companies = Counter({ self.base_dataset[x][0]["company_name"]: len(y) for x, y in companies_games.items() })
+        companies_games = companies_games
+
+        countries_acc = defaultdict(set)
+        companies_with_country = 0
+        for company_id in companies_games.keys():
+            if company_id in self.slug_map:
+                slug = self.slug_map[company_id]
+                if slug in self.country_map:
+                    companies_with_country += 1
+                    countries_acc[self.country_map[slug]].add(self.base_dataset[company_id][0]["company_name"])
+        
+        countries_accumulated = Counter({x: len(y) for x, y in countries_acc.items() })        
+
+        """
+        needed return values
+        platforms=platforms, 
+        countries=countries,
+        companies_n=len(dataset.companies),
+        most_common=list(dataset.companies.most_common(30)),
+        company_games=dict(dataset.companies_games),
+        company_countries=list(dataset.countries_accumulated.most_common(200)),
+        companies_with_country=dataset.companies_with_country,
+        production_roles=list(dataset.production_roles.most_common(50))
+        """
+
+        return {
+            "companies": companies,
+            "companies_most_common": list(companies.most_common(30)),
+            "company_games": dict(companies_games),
+            "company_countries": list(countries_accumulated.most_common(200)),
+            "companies_with_country": companies_with_country,
+            "production_roles": list(production_roles.most_common(50))
+        }        
+
+        
+
+    def set_filter(self, platforms, countries):
+        self.filtered_dataset = {}
+        countries = set(countries)
+        for company_id, games in self.base_dataset.items():
+            
+            filtered_games = []
+            for game in games:
+                add = False
+                if game["platform"] in platforms or len(platforms) == 0:
+                    #companies.update([ game["company_name"] ])
+                    if len(countries) > 0:
+                        if len(countries.intersection(game["release_countries"])) > 0:
+                            add = True
+                    else:
+                        add = True
+                        
+                if add:
+                    filtered_games.append(game)
+            if len(filtered_games) > 0:
+                self.filtered_dataset[company_id] = filtered_games
 
 
-    def get_data(self):
+    def setup_data(self):
         self.platforms = set()
         self.countries = set()
+        self.roles = set()
         for games in self.base_dataset.values():
             for game in games:
                 if game["platform"]:
@@ -70,4 +156,4 @@ class CompanyDataset():
             data = json.load(f)
         self.country_map = { x["mobygames_slug"]: x["country"] for x in data if x["country"] }
 
-        self.get_data()
+        self.setup_data()
