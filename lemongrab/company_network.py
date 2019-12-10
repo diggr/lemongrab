@@ -2,11 +2,16 @@ import networkx as nx
 import json
 from tqdm import tqdm
 from itertools import combinations
+from provit import Provenance
 
 COMPANY_DATASET = "datasets/mobygames_companies.json"
 WIKIDATA_MAPPING = "datasets/wikidata_mapping.json"
 ID_2_SLUG = "datasets/mobygames_companies_id_to_slug.json"
 
+#provenance infomration
+PROV_AGENT = "lemongrab.py"
+PROV_ACTIVITY = "build_company_network"
+PROV_DESC = "Company graph containing all companies for platforms {platforms} and release countries {countries}"
 
 def load_company_dataset():
     with open(COMPANY_DATASET) as f:
@@ -117,6 +122,20 @@ class CompanyNetworkBuilder():
             return "undefined"
 
 
+    def countries_str(self, countries):
+        if countries:
+            return "_".join(countries).replace(" ", "_")
+        else:
+            return ""
+
+
+    def platform_str(self, platform):
+        if platform:
+            return platform.replace(" ","_")
+        else:
+            return ""
+
+
     def __init__(self, countries=None, platform=None, roles=False, publisher=False):
 
         self.roles = roles
@@ -174,10 +193,8 @@ class CompanyNetworkBuilder():
             g.nodes[node]["no_of_games"] = len(games[node])
 
         out_file = "company_networks/company_network_"
-        if countries:
-            out_file += "_".join(countries).replace(" ", "_")
-        if platform:
-            out_file += "_{}".format(platform.replace(" ","_"))
+        out_file += self.countries_str(countries)
+        out_file += "_"+self.platform_str(platform)
         if self.roles:
             out_file += "_roles"
         if self.publisher:
@@ -190,3 +207,10 @@ class CompanyNetworkBuilder():
         print("Edges in network: {}".format(len(g.edges)))
         print("Games: {}".format(len(all_games)))
 
+        prov = Provenance(out_file)
+        prov.add(
+            agents = [PROV_AGENT],
+            activity = PROV_ACTIVITY,
+            description = PROV_DESC.format(platforms=self.platform_str(platform), countries=self.countries_str(countries)) 
+        )
+        prov.save()
