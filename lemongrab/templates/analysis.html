@@ -48,9 +48,36 @@
 </head>
 <body>
 
+
+    
     <!-- Primary Page Layout
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <div class="container">
+
+
+        <a id='csv_download'></a>
+        <div id='yada'>abc</div>
+
+        <script type="text/javascript">
+    
+                function download_csv   (data, headers, title) {
+                    var csv = headers[0]+','+headers[1]+'\n'
+                    data.forEach(function(row) {
+                            csv += row.join('\t');
+                            csv += "\n";
+                    })
+                    const dl = document.getElementById("csv_download")
+                    dl.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
+                    dl.target = '_blank'
+                    dl.download = title+'.csv'
+                    dl.click()
+                    dl.html = "abc"
+                }
+        </script>
+
+
+
+
         <div class="row">
             <div class="ten column" style="margin-top: 10%">
                 <h3>LEMONGRAB</h3>
@@ -115,7 +142,14 @@
                     }                   
                 });
 
+            var no_company_data = [ 
+                {% for c in most_common %}
+                    ["{{ c[0] }}", "{{ c[1]}}"],
+                {% endfor %}
+            ]
+
             </script>
+            <button onclick="download_csv(no_company_data, ['company', 'no_of_games'], 'company_stats')">Download TSV</button> 
         </div>
 
         <div class="row"  style="margin-top: 5%">
@@ -160,8 +194,14 @@
                             },
                         }                   
                     });
-    
+
+                    var company_countries_data = [ 
+                        {% for c in company_countries %}
+                            ["{{ c[0] }}", "{{ c[1]}}"],
+                        {% endfor %}
+                    ]
                 </script>
+                <button onclick="download_csv(company_countries_data, ['country', 'no_of_companies'], 'country_stats')">Download TSV</button> 
             </div>        
 
 
@@ -208,7 +248,13 @@
                         }                   
                     });
     
+                    var production_roles_data = [ 
+                        {% for c in production_roles %}
+                            ["{{ c[0] }}", "{{ c[1]}}"],
+                        {% endfor %}
+                    ]
                 </script>
+                <button onclick="download_csv(production_roles_data, ['role', 'mentions'], 'country_stats')">Download TSV</button> 
             </div>  
 
             <!-- GAMES TABLE -->
