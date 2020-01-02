@@ -33,14 +33,15 @@ def load_company_dataset():
 
 class CompanyNetworkBuilder():
     
-    """
-    Returns a list of unique ids for a game company when roles should be 
-    considered:
-    ["<COMPANY_ID>__<ROLE1>", "<COMPANY_ID>__<ROLE2>", ... ]
-    otherwhise just return company id:
-    ["COMPANY_ID"]
-    """
+
     def company_ids(self, company_id, games):
+        """
+        Returns a list of unique ids for a game company when roles should be 
+        considered:
+        ["<COMPANY_ID>__<ROLE1>", "<COMPANY_ID>__<ROLE2>", ... ]
+        otherwise just returns company id:
+        ["COMPANY_ID"]
+        """
         ids = []
         if self.roles:
             roles = set([ x["production_role"] for x in games ])
@@ -54,11 +55,11 @@ class CompanyNetworkBuilder():
             return [ company_id ]
 
 
-    """
-    Returns a list of company_ids who worked on games released in :countries:
-    and on :platform:
-    """
     def _filter_dataset(self, dataset, countries, platform):
+        """
+        Returns a list of company_ids who worked on games released in :countries:
+        and on :platform:
+        """
         filtered_ids = []
         for company_id, games in dataset.items():
 
@@ -78,25 +79,22 @@ class CompanyNetworkBuilder():
             if platform and not countries:
                 if platform in platforms:
                     filtered_ids += self.company_ids(company_id, games)
-                    #filtered_ids.append(company_id)
 
             elif countries and not platform:
                 if c_overlap > 0:
                     filtered_ids += self.company_ids(company_id, games)
-                    #filtered_ids.append(company_id)
             else:
                 if c_overlap > 0 and platform in platforms:
                     filtered_ids += self.company_ids(company_id, games)
-                    #filtered_ids.append(company_id)
 
         print(len(filtered_ids))
         return filtered_ids
 
 
-    """
-    Returns a list of all games a company worked on based on filter criterias countries, platform and role
-    """
     def _filter_games(self, ds, countries, platform, role):
+        """
+        Returns a list of all games a company worked on based on filter criterias countries, platform and role
+        """
         if countries:
             ds = [ x for x in ds if len(set(x["release_countries"]).intersection(set(countries))) > 0 ]
         if platform:
@@ -107,11 +105,12 @@ class CompanyNetworkBuilder():
         return set([ x["game_slug"] for x in ds ])
 
 
-    """
-    Returns country information from wikidata for a mobygames compnay id :company_id:
-    Returns "undefined" if no country information is available
-    """
+
     def _get_wiki_country(self, company_id):
+        """
+        Returns country information from wikidata for a mobygames compnay id :company_id:
+        Returns "undefined" if no country information is available
+        """        
         slug = self.companies["slug_map"][company_id]
         country = ""
         if slug in self.companies["wiki_map"]:
@@ -179,7 +178,7 @@ class CompanyNetworkBuilder():
             if len(overlap) > 0:
                 g.add_edge(c1, c2, weight=len(overlap))
         
-        #add noe information
+        #add node information
         for node in g.nodes():
             id_ = node.split("__")[0]
             if self.roles:
