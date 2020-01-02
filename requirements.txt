@@ -4,3 +4,4 @@ Click==7.0
 networkx==2.3
 SPARQLWrapper==1.8.4
 provit==1.0.2
+git+git://github.com/diggr/diggrtoolbox@master#egg=diggrtoolbox
