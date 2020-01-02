@@ -30,6 +30,7 @@ def build_company_dataset():
                         "game_id": id_,
                         "game_slug": slug,
                         "game_title": data["title"],
+                        "game_years": data["years"],
                         "production_role": company["role"],
                         "release_countries": release["countries"],
                         "platform": pm[platform["platform_name"]]

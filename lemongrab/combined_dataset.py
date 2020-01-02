@@ -1,3 +1,14 @@
+"""
+Prepares a company dataset for the lemongrab browser
+
+use:
+
+dataset = CompanyDataset()
+dataset.set_filter(platforms, countries)
+overview = dataset.get_overview()
+
+"""
+
 import json
 import pandas as pd
 from tqdm import tqdm

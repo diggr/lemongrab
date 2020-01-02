@@ -64,6 +64,12 @@ This dataset contains all companies and the games they were working on.
             "company_name": "Fox Interactive, Inc.",
             "game_id": "672",
             "game_slug": "die-hard-trilogy",
+            "game_title": "Die Hard Trilogy",
+            "game_years": [
+                1996,
+                1997,
+                1998
+            ],
             "production_role": "Published by",
             "release_countries": [
                 "Sweden",
