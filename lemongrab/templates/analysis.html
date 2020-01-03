@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lemongrab.css') }}">
 
     <!-- JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
 
     <!-- Favicon
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -32,18 +32,15 @@
 
 
     <!-- jquery -->
-    <script
-    src="https://code.jquery.com/jquery-3.4.1.min.js"
-    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-    crossorigin="anonymous"></script>    
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>    
 
     <!-- DATATABLES -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.min.css') }}">
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css">
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/buttons.dataTables.min.css') }}">
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename='js/dataTables.buttons.min.js') }}"></script>    
+    <script type="text/javascript" charset="utf8" src="{{ url_for('static', filename='js/buttons.html5.min.js') }}"></script>    
     
 </head>
 <body>
