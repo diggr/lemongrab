@@ -3,12 +3,7 @@ import click
 from lemongrab.wikidata import build_wikidata_mapping
 from lemongrab.company_dataset import build_company_dataset
 from lemongrab.company_network import CompanyNetworkBuilder
-
-try:
-    from lemongrab.browser import start_browser
-    BROWSER_AVAILABLE = True
-except Exception:
-    BROWSER_AVAILABLE = False
+from lemongrab.browser import start_browser
 
 cli = click.Group()
 
@@ -20,10 +15,10 @@ def wikidata_mapping():
 def company_dataset():
     build_company_dataset()
 
-if BROWSER_AVAILABLE:
-    @cli.command()
-    def browser():
-        start_browser()
+
+@cli.command()
+def browser():
+    start_browser()
 
 
 @cli.command()
