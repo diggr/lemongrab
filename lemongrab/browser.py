@@ -59,6 +59,7 @@ def start_webbrowser():
     time.sleep(1)
     webbrowser.open("http://localhost:{}".format(PORT))        
 
+
 def start_browser():
     backend_process = Process(target=start_backend)
     backend_process.start()

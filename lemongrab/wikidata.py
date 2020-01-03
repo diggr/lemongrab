@@ -1,3 +1,8 @@
+"""
+Builds a local dataset with country information of all videogame companies
+with a mobygames id in wikidata. 
+"""
+
 from SPARQLWrapper import SPARQLWrapper, JSON
 from provit import Provenance
 import json

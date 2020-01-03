@@ -6,7 +6,6 @@ use:
 dataset = CompanyDataset()
 dataset.set_filter(platforms, countries)
 overview = dataset.get_overview()
-
 """
 
 import json
@@ -78,7 +77,6 @@ class CompanyDataset():
             "games_table": dict(games_dataset)
         }        
 
-        
 
     def set_filter(self, platforms, countries):
         self.filtered_dataset = {}

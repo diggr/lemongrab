@@ -1,3 +1,24 @@
+"""
+Builds a game company network based on the company dataset.
+
+Nodes:  game companies (or game companies and their specific production roles (
+        e.g. "Nintendo_Developed By", and "Nintendo_Published By"))
+Edges:  Number of games both companies worked on (based on their co-appearence in the 
+        release information)
+
+Additional node information:
+* label
+* country information based on wikidata dataset
+* num_of_games: number of games the company worked on, within the filtered dataset
+
+
+Filter options:
+
+* countries: resease country (can be multiple)
+* platform (can be multiple)
+
+"""
+
 import networkx as nx
 import json
 from tqdm import tqdm

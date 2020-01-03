@@ -1,3 +1,28 @@
+"""
+Builds a reduced local company dataset from the unified api mobygames dataset.
+
+The dataset is dictionary with the (mobygames) company id as its key, and a list of
+the production roles for all the games the company was involved in.
+
+<company_id>: [ <game_1_prod_info_1>, <game_1_prod_info_2>, <game_3_prod_info_1> , ... ]
+
+
+The production information contain the data points:
+
+Company-specific information:
+* company_name
+* production role
+
+Game-specific information:
+* game_id
+* game_slug
+* game_title
+* game_years
+* release_countries
+* platform
+
+"""
+
 import json
 import diggrtoolbox as dt
 from collections import defaultdict
