@@ -21,7 +21,9 @@ Filter options:
 
 import networkx as nx
 import json
+import yaml
 from tqdm import tqdm
+from collections import defaultdict
 from itertools import combinations
 from provit import Provenance
 
@@ -34,26 +36,38 @@ PROV_AGENT = "lemongrab.py"
 PROV_ACTIVITY = "build_company_network"
 PROV_DESC = "Company graph containing all companies for platforms {platforms} and release countries {countries}"
 
-def load_company_dataset():
-    with open(COMPANY_DATASET) as f:
-        ds = json.load(f)
-    with open(WIKIDATA_MAPPING) as f:
-        wiki = json.load(f)
-    with open(ID_2_SLUG) as f:
-        id_2_slug = json.load(f)
 
-    id_2_slug_map = { x["company_id"]: x["slug"] for x in id_2_slug }
-    wiki_map = { x["mobygames_slug"]: x for x in wiki }
-
-    return {
-        "production_details": ds,
-        "slug_map": id_2_slug_map,
-        "wiki_map": wiki_map
-    }
 
 
 class CompanyNetworkBuilder():
     
+    def _load_company_dataset(self):
+        with open(COMPANY_DATASET) as f:
+            ds = json.load(f)
+        with open(WIKIDATA_MAPPING) as f:
+            wiki = json.load(f)
+        with open(ID_2_SLUG) as f:
+            id_2_slug = json.load(f)
+
+        id_2_slug_map = { x["company_id"]: x["slug"] for x in id_2_slug }
+        wiki_map = { x["mobygames_slug"]: x for x in wiki }
+
+        company_dataset = defaultdict(list)
+        if self.gamelist:
+            for company_id, games in ds.items():
+                for game in games:
+                    #print(game)
+                    if game["game_slug"] in self.gamelist:
+                        company_dataset[company_id].append(game)
+        else:
+            company_dataset = ds
+
+        return {
+            "production_details": dict(company_dataset),
+            "slug_map": id_2_slug_map,
+            "wiki_map": wiki_map
+        }
+
 
     def company_ids(self, company_id, games):
         """
@@ -84,9 +98,8 @@ class CompanyNetworkBuilder():
         filtered_ids = []
         for company_id, games in dataset.items():
 
-
             if not platform and not countries:
-                filtered_ids.append(company_id)
+                filtered_ids += self.company_ids(company_id, games)
                 continue
 
             r_countries = set()
@@ -155,14 +168,29 @@ class CompanyNetworkBuilder():
         else:
             return ""
 
+    def _load_gamelist(self, gamelist_file):
+        with open(gamelist_file) as f:
+            games = yaml.safe_load(f)
 
-    def __init__(self, countries=None, platform=None, roles=False, publisher=False):
+        gamelist = []
+        for title, links in games.items():
+            for mg_slug in links["mobygames"]:
+                gamelist.append(mg_slug)
+
+        return gamelist
+
+    def __init__(self, gamelist=None, countries=None, platform=None, roles=False, publisher=False):
 
         self.roles = roles
         self.publisher = publisher
+        self.gamelist_file = gamelist
+        self.gamelist = None
+        if gamelist:
+            self.gamelist = self._load_gamelist(gamelist)
 
-        self.companies = load_company_dataset()
+        self.companies = self._load_company_dataset()
         #slug_map = companies["slug_map"]
+
 
         g = nx.Graph()
         
@@ -170,8 +198,12 @@ class CompanyNetworkBuilder():
 
         print("generating network graph ...")
         games = {}
-        for c1, c2 in tqdm(combinations(self._filter_dataset(self.companies["production_details"], countries, platform), 2)):
 
+        company_list = self._filter_dataset(self.companies["production_details"], countries, platform)
+        for c in company_list:
+            g.add_node(c)
+
+        for c1, c2 in tqdm(combinations(company_list, 2)):
             if self.roles:
                 c1_id = c1.split("__")[0]
                 c1_role = c1.split("__")[1]
@@ -213,8 +245,12 @@ class CompanyNetworkBuilder():
             g.nodes[node]["no_of_games"] = len(games[node])
 
         out_file = "company_networks/company_network_"
-        out_file += self.countries_str(countries)
-        out_file += "_"+self.platform_str(platform)
+        if self.gamelist_file:
+            project_name = self.gamelist_file.split("/")[-1].replace(".yml", "")
+            out_file += project_name
+        else:
+            out_file += self.countries_str(countries)
+            out_file += "_"+self.platform_str(platform)
         if self.roles:
             out_file += "_roles"
         if self.publisher:

@@ -22,12 +22,13 @@ def browser():
 
 
 @cli.command()
+@click.option("--gamelist", "-g", default=None)
 @click.option("--country", "-c", multiple=True, default=None)
 @click.option("--platform", "-p", default=None)
 @click.option("--roles/--no-roles", default=False)
 @click.option("--publisher/--no-publisher", default=False)
-def company_network(country, platform, roles, publisher):
-    cn = CompanyNetworkBuilder(country, platform, roles, publisher)
+def company_network(gamelist, country, platform, roles, publisher):
+    cn = CompanyNetworkBuilder(gamelist, country, platform, roles, publisher)
 
 if __name__ == "__main__":
     cli()
