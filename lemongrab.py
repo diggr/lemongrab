@@ -9,15 +9,24 @@ cli = click.Group()
 
 @cli.command()
 def wikidata_mapping():
+    """
+    Fetch new Wikidata company dataset
+    """
     build_wikidata_mapping()
 
 @cli.command()
 def company_dataset():
+    """
+    Build new company dataset from the Mobygames dataset
+    """
     build_company_dataset()
 
 
 @cli.command()
 def browser():
+    """
+    Start data exploration and visualization browser
+    """
     start_browser()
 
 
@@ -28,6 +37,9 @@ def browser():
 @click.option("--roles/--no-roles", default=False)
 @click.option("--publisher/--no-publisher", default=False)
 def company_network(gamelist, country, platform, roles, publisher):
+    """
+    Build company network for Gephi import
+    """
     cn = CompanyNetworkBuilder(gamelist, country, platform, roles, publisher)
 
 if __name__ == "__main__":
