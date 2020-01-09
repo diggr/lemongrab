@@ -6,6 +6,7 @@ from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, render_template, request
 
 from .combined_dataset import CompanyDataset
+from .utils import load_gamelist
 
 """
 Simple browser application for exploring the game companies dataset
@@ -22,11 +23,22 @@ dataset = CompanyDataset()
 
 @app.route("/analysis", methods=["POST"])
 def analysis():
+
+    gamelist_file = request.form.getlist("gamelist_file")[0]
     countries = request.form.getlist("country_dropdown")    
     platforms = request.form.getlist("platform_dropdown")
-    print("set filter->")
-    dataset.set_filter(platforms, countries)
-    print("get overview data")
+    
+    if not gamelist_file:
+
+        print("set filter->")
+        dataset.set_filter(platforms, countries)
+        print("get overview data")
+
+    else:
+        gamelist = load_gamelist(gamelist_file)
+        dataset.set_gamelist_filter(gamelist)
+        print("gamelist file")
+
     data = dataset.get_overview()
     return render_template(
         "analysis.html", 

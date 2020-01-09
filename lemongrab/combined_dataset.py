@@ -21,11 +21,14 @@ class CompanyDataset():
     def get_company_data(self, company_name):
         pass
 
+
     def get_company_country_data(self, company):
         pass
 
+
     def get_production_role_data(self, production_role):
         pass
+
 
     def get_overview(self):
         production_roles = Counter()
@@ -76,6 +79,19 @@ class CompanyDataset():
             "production_roles": list(production_roles.most_common(50)),
             "games_table": dict(games_dataset)
         }        
+
+
+    def set_gamelist_filter(self, gamelist):
+        self.filtered_dataset = {}
+
+        for company_id, games in self.base_dataset.items():
+            filtered_games = []
+            for game in games:
+                if game["game_slug"] in gamelist:
+                    filtered_games.append(game)
+            
+            if len(filtered_games) > 0:
+                self.filtered_dataset[company_id] = filtered_games
 
 
     def set_filter(self, platforms, countries):
