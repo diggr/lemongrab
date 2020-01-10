@@ -27,7 +27,7 @@ def analysis():
     gamelist_file = request.form.getlist("gamelist_file")[0]
     countries = request.form.getlist("country_dropdown")    
     platforms = request.form.getlist("platform_dropdown")
-    
+
     if not gamelist_file:
 
         print("set filter->")
@@ -40,6 +40,12 @@ def analysis():
         print("gamelist file")
 
     data = dataset.get_overview()
+
+    try:
+        companies_ratio = data["companies_with_country"] / len(data["companies"])
+    except:
+        companies_ratio = 0
+
     return render_template(
         "analysis.html", 
         platforms=platforms, 
@@ -49,6 +55,7 @@ def analysis():
         company_games=data["company_games"],
         company_countries=data["company_countries"],
         companies_with_country=data["companies_with_country"],
+        companies_country_ratio=companies_ratio,
         production_roles=data["production_roles"],
         games_table=data["games_table"]
         )
