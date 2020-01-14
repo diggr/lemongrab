@@ -3,7 +3,12 @@ import click
 from lemongrab.wikidata import build_wikidata_mapping
 from lemongrab.company_dataset import build_company_dataset
 from lemongrab.company_network import CompanyNetworkBuilder
-from lemongrab.browser import start_browser
+
+company_dataset_present = True
+try:
+    from lemongrab.browser import start_browser
+except FileNotFoundError:
+    company_dataset_present = False
 
 cli = click.Group()
 
@@ -21,13 +26,13 @@ def company_dataset():
     """
     build_company_dataset()
 
-
-@cli.command()
-def browser():
-    """
-    Start data exploration and visualization browser
-    """
-    start_browser()
+if company_dataset_present:
+    @cli.command()
+    def browser():
+        """
+        Start data exploration and visualization browser
+        """
+        start_browser()
 
 
 @cli.command()
