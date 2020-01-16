@@ -22,10 +22,13 @@ Filter options:
 import networkx as nx
 import json
 import yaml
+import os
 from tqdm import tqdm
 from collections import defaultdict
 from itertools import combinations
 from provit import Provenance
+
+OUT_DIR = "company_networks"
 
 COMPANY_DATASET = "datasets/mobygames_companies.json"
 WIKIDATA_MAPPING = "datasets/wikidata_mapping.json"
@@ -244,7 +247,13 @@ class CompanyNetworkBuilder():
                 g.nodes[node]["label"] = self.companies["production_details"][id_][0]["company_name"]
             g.nodes[node]["no_of_games"] = len(games[node])
 
-        out_file = "company_networks/company_network_"
+
+        if not os.path.exists(OUT_DIR):
+            os.makedirs(OUT_DIR)
+        
+
+
+        out_file = "company_network_"
         if self.gamelist_file:
             project_name = self.gamelist_file.split("/")[-1].replace(".yml", "")
             out_file += project_name
@@ -257,13 +266,15 @@ class CompanyNetworkBuilder():
             out_file += "_pub"
         out_file += ".graphml"
 
-        print("\nNetwork file saved as: {}\n".format(out_file))
-        nx.write_graphml(g, out_file)
+        out_filepath = os.path.join(OUT_DIR, out_file)
+
+        print("\nNetwork file saved as: {}\n".format(out_filepath))
+        nx.write_graphml(g, out_filepath)
         print("Nodes in network: {}".format(len(g.nodes)))
         print("Edges in network: {}".format(len(g.edges)))
         print("Games: {}".format(len(all_games)))
 
-        prov = Provenance(out_file)
+        prov = Provenance(out_filepath)
         prov.add(
             agents = [PROV_AGENT],
             activity = PROV_ACTIVITY,
