@@ -4,6 +4,7 @@ from lemongrab.wikidata import build_wikidata_mapping
 from lemongrab.company_dataset import build_company_dataset
 from lemongrab.company_network import CompanyNetworkBuilder
 from lemongrab.browser import start_browser
+from config import DIGGR_API
 
 cli = click.Group()
 
@@ -19,7 +20,7 @@ def company_dataset():
     """
     Build new company dataset from the Mobygames dataset
     """
-    build_company_dataset()
+    build_company_dataset(DIGGR_API)
 
 
 @cli.command()

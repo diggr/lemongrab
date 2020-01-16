@@ -36,9 +36,9 @@ PROV_AGENT = "lemongrab.py"
 PROV_ACTIVITY = "build_companies_dataset"
 PROV_DESC = "Dataset containing all companies in mobygames and their corresponding game/release information"
 
-def build_company_dataset():
+def build_company_dataset(api):
 
-    api = DiggrApi("http://172.18.85.170:6660")
+    api = DiggrApi(api)
     pm = dt.PlatformMapper("mobygames")
 
     dataset = defaultdict(list)
