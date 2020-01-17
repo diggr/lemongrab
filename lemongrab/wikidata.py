@@ -25,7 +25,7 @@ PROV_DESC = "Contains all items in Wikidata with a Mobygames Company ID (P4773) 
 
 
 def build_wikidata_mapping():
-    sparql = SPARQLWrapper(SPARQL_ENDPOINT)
+    sparql = SPARQLWrapper(SPARQL_ENDPOINT, agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')
 
     sparql.setQuery(QUERY)
     sparql.setReturnFormat(JSON)    
