@@ -52,8 +52,11 @@ Builds a network of companies based on their common work on games
 | -- | -- | -- | -- |
 | --country/-c | Release country | X | -- |
 | --platform/-p | Release platform | X | -- |
+| --gamelist/-g | Use tulpa gamelist as filter | -- | -- |
 | --roles/--no-roles | Differentiate companies by their production roles | -- | --no-roles |
 | --publisher/--no-publisher | Include/exclude publisher roles; only needed when --roles option is set | -- | --no-publisher |
+
+You can either filter by Country/Platform OR tulpa gamelist.
 
 ### `browser`
 
