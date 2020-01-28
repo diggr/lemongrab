@@ -26,6 +26,7 @@ import os
 from tqdm import tqdm
 from collections import defaultdict
 from itertools import combinations
+from pathlib import Path
 from provit import Provenance
 
 OUT_DIR = "company_networks"
@@ -256,38 +257,38 @@ class CompanyNetworkBuilder():
             g.nodes[node]["country"] = self._get_wiki_country(id_)
             if self.roles:
                 g.nodes[node]["label"] = self.companies["production_details"][id_][0]["company_name"] + "(" + role + ")"
+                g.nodes[node]["company_name"] = self.companies["production_details"][id_][0]["company_name"]
+                g.nodes[node]["role"] = role
             else:
                 g.nodes[node]["label"] = self.companies["production_details"][id_][0]["company_name"]
             g.nodes[node]["no_of_games"] = len(games[node])
 
-
-        if not os.path.exists(OUT_DIR):
-            os.makedirs(OUT_DIR)
+        out_path = Path(OUT_DIR)
+        if not out_path.is_dir():
+            out_path.mkdir()
+        out_filename = "company_network_"
         
-
-
-        out_file = "company_network_"
         if self.gamelist_file:
             project_name = self.gamelist_file.split("/")[-1].replace(".yml", "")
-            out_file += project_name
+            out_filename += project_name
         else:
-            out_file += self.countries_str(countries)
-            out_file += "_"+self.platform_str(platform)
+            out_filename += self.countries_str(countries)
+            out_filename += "_"+self.platform_str(platform)
         if self.roles:
-            out_file += "_roles"
+            out_filename += "_roles"
         if self.publisher:
-            out_file += "_pub"
-        out_file += ".graphml"
+            out_filename += "_pub"
+        out_filename += ".graphml"
 
-        out_filepath = os.path.join(OUT_DIR, out_file)
+        out_file = out_path / out_filename
 
-        print("\nNetwork file saved as: {}\n".format(out_filepath))
-        nx.write_graphml(g, out_filepath)
+        print("\nNetwork file saved as: {}n".format(out_file))
+        nx.write_graphml(g, out_file)
         print("Nodes in network: {}".format(len(g.nodes)))
         print("Edges in network: {}".format(len(g.edges)))
         print("Games: {}".format(len(all_games)))
 
-        prov = Provenance(out_filepath)
+        prov = Provenance(out_file)
         prov.add(
             agents = [PROV_AGENT],
             activity = PROV_ACTIVITY,
