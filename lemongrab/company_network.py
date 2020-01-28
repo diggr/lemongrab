@@ -45,6 +45,10 @@ PROV_DESC = "Company graph containing all companies for platforms {platforms} an
 class CompanyNetworkBuilder():
     
     def _load_company_dataset(self):
+        """
+        Opens company dataset, wikidata mapping and mobygames id to slug mapping
+        and returns a combined dict with information of all of these datasets.
+        """
         with open(COMPANY_DATASET) as f:
             ds = json.load(f)
         with open(WIKIDATA_MAPPING) as f:
@@ -159,6 +163,9 @@ class CompanyNetworkBuilder():
 
 
     def countries_str(self, countries):
+        """
+        Returns a somewhat normalized country string.
+        """
         if countries:
             return "_".join(countries).replace(" ", "_")
         else:
@@ -166,12 +173,18 @@ class CompanyNetworkBuilder():
 
 
     def platform_str(self, platform):
+        """
+        Returns a somewhat normalized platform string.
+        """
         if platform:
             return platform.replace(" ","_")
         else:
             return ""
 
     def _load_gamelist(self, gamelist_file):
+        """
+        Loads gamelist from given gamelist_file and returns a list of all mobygames slugs.
+        """
         with open(gamelist_file) as f:
             games = yaml.safe_load(f)
 

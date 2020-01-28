@@ -37,10 +37,10 @@ if company_dataset_present:
 
 
 @cli.command()
-@click.option("--gamelist", "-g", default=None)
-@click.option("--country", "-c", multiple=True, default=None)
-@click.option("--platform", "-p", default=None)
-@click.option("--roles/--no-roles", default=False)
+@click.option("--gamelist", "-g", default=None, help="Filename of a tulpa generated gamelist to be used")
+@click.option("--country", "-c", multiple=True, default=None, help="Include countries")
+@click.option("--platform", "-p", default=None, help="Include the platforms of the games")
+@click.option("--roles/--no-roles", default=False, help="Include/Exclude roles of a company")
 @click.option("--publisher/--no-publisher", default=False)
 def company_network(gamelist, country, platform, roles, publisher):
     """
