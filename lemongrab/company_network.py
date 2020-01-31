@@ -29,6 +29,9 @@ from itertools import combinations
 from pathlib import Path
 from provit import Provenance
 
+from .combined_dataset import CompanyDataset
+from .utils import load_gamelist
+
 OUT_DIR = "company_networks"
 
 COMPANY_DATASET = "datasets/mobygames_companies.json"
@@ -44,37 +47,7 @@ PROV_DESC = "Company graph containing all companies for platforms {platforms} an
 
 
 class CompanyNetworkBuilder():
-    
-    def _load_company_dataset(self):
-        """
-        Opens company dataset, wikidata mapping and mobygames id to slug mapping
-        and returns a combined dict with information of all of these datasets.
-        """
-        with open(COMPANY_DATASET) as f:
-            ds = json.load(f)
-        with open(WIKIDATA_MAPPING) as f:
-            wiki = json.load(f)
-        with open(ID_2_SLUG) as f:
-            id_2_slug = json.load(f)
 
-        id_2_slug_map = { x["company_id"]: x["slug"] for x in id_2_slug }
-        wiki_map = { x["mobygames_slug"]: x for x in wiki }
-
-        company_dataset = defaultdict(list)
-        if self.gamelist:
-            for company_id, games in ds.items():
-                for game in games:
-                    #print(game)
-                    if game["game_slug"] in self.gamelist:
-                        company_dataset[company_id].append(game)
-        else:
-            company_dataset = ds
-
-        return {
-            "production_details": dict(company_dataset),
-            "slug_map": id_2_slug_map,
-            "wiki_map": wiki_map
-        }
 
 
     def company_ids(self, company_id, games):
@@ -98,39 +71,6 @@ class CompanyNetworkBuilder():
             return [ company_id ]
 
 
-    def _filter_dataset(self, dataset, countries, platform):
-        """
-        Returns a list of company_ids who worked on games released in :countries:
-        and on :platform:
-        """
-        filtered_ids = []
-        for company_id, games in dataset.items():
-
-            if not platform and not countries:
-                filtered_ids += self.company_ids(company_id, games)
-                continue
-
-            r_countries = set()
-            platforms = set()
-            for game in games:
-                r_countries.update(game["release_countries"])
-                platforms.update([game["platform"]])
-        
-            c_overlap = len(set(countries).intersection(r_countries))
-
-            if platform and not countries:
-                if platform in platforms:
-                    filtered_ids += self.company_ids(company_id, games)
-
-            elif countries and not platform:
-                if c_overlap > 0:
-                    filtered_ids += self.company_ids(company_id, games)
-            else:
-                if c_overlap > 0 and platform in platforms:
-                    filtered_ids += self.company_ids(company_id, games)
-
-        print(len(filtered_ids))
-        return filtered_ids
 
 
     def _filter_games(self, ds, countries, platform, role):
@@ -153,10 +93,10 @@ class CompanyNetworkBuilder():
         Returns country information from wikidata for a mobygames compnay id :company_id:
         Returns "undefined" if no country information is available
         """        
-        slug = self.companies["slug_map"][company_id]
+        slug = self.dataset.slug_map[company_id]
         country = ""
-        if slug in self.companies["wiki_map"]:
-            country = self.companies["wiki_map"][slug]["country"]
+        if slug in self.dataset.country_map:
+            country = self.dataset.country_map[slug]
         if country:
             return country
         else:
@@ -182,41 +122,32 @@ class CompanyNetworkBuilder():
         else:
             return ""
 
-    def _load_gamelist(self, gamelist_file):
-        """
-        Loads gamelist from given gamelist_file and returns a list of all mobygames slugs.
-        """
-        with open(gamelist_file) as f:
-            games = yaml.safe_load(f)
-
-        gamelist = []
-        for title, links in games.items():
-            for mg_slug in links["mobygames"]:
-                gamelist.append(mg_slug)
-
-        return gamelist
-
     def __init__(self, gamelist=None, countries=None, platform=None, roles=False, publisher=False):
 
         self.roles = roles
         self.publisher = publisher
         self.gamelist_file = gamelist
-        self.gamelist = None
-        if gamelist:
-            self.gamelist = self._load_gamelist(gamelist)
-
-        self.companies = self._load_company_dataset()
-        #slug_map = companies["slug_map"]
-
 
         g = nx.Graph()
-        
         all_games = set()
 
         print("generating network graph ...")
         games = {}
 
-        company_list = self._filter_dataset(self.companies["production_details"], countries, platform)
+        self.dataset = CompanyDataset()
+        self.dataset.set_filter([platform], countries)
+
+        if not self.gamelist_file:
+            self.dataset.set_filter([platform], countries)
+        else:
+            gamelist = load_gamelist(self.gamelist_file)
+            self.dataset.set_gamelist_filter(gamelist)
+
+
+        company_list = []
+        for company_id, production_roles in self.dataset.filtered_dataset.items():
+            company_list += self.company_ids(company_id, production_roles)
+
         for c in company_list:
             g.add_node(c)
 
@@ -233,12 +164,12 @@ class CompanyNetworkBuilder():
                 c2_role = None              
 
             if c1 not in games:
-                games[c1] = self._filter_games(self.companies["production_details"][c1_id], countries, platform, c1_role)
+                games[c1] = self._filter_games(self.dataset.filtered_dataset[c1_id], countries, platform, c1_role)
             else:
                 c1_games = games[c1]
 
             if c2 not in games:
-                games[c2] = self._filter_games(self.companies["production_details"][c2_id], countries, platform, c2_role)
+                games[c2] = self._filter_games(self.dataset.filtered_dataset[c2_id], countries, platform, c2_role)
             else:
                 c2_games = games[c2]
 
@@ -256,11 +187,11 @@ class CompanyNetworkBuilder():
 
             g.nodes[node]["country"] = self._get_wiki_country(id_)
             if self.roles:
-                g.nodes[node]["label"] = self.companies["production_details"][id_][0]["company_name"] + "(" + role + ")"
-                g.nodes[node]["company_name"] = self.companies["production_details"][id_][0]["company_name"]
+                g.nodes[node]["label"] = self.dataset.filtered_dataset[id_][0]["company_name"] + "(" + role + ")"
+                g.nodes[node]["company_name"] = self.dataset.filtered_dataset[id_][0]["company_name"]
                 g.nodes[node]["role"] = role
             else:
-                g.nodes[node]["label"] = self.companies["production_details"][id_][0]["company_name"]
+                g.nodes[node]["label"] = self.dataset.filtered_dataset[id_][0]["company_name"]
             g.nodes[node]["no_of_games"] = len(games[node])
 
         out_path = Path(OUT_DIR)
@@ -287,6 +218,7 @@ class CompanyNetworkBuilder():
         print("Nodes in network: {}".format(len(g.nodes)))
         print("Edges in network: {}".format(len(g.edges)))
         print("Games: {}".format(len(all_games)))
+
 
         prov = Provenance(out_file)
         prov.add(
