@@ -58,6 +58,12 @@ Builds a network of companies based on their common work on games
 
 You can either filter by Country/Platform OR tulpa gamelist.
 
+Options which allow multiple invokation (currently country and platform) can be used multiple times in the same call, e.g.:
+
+```zsh
+$ python lemongrab.py company-network -c Japan -c Worldwide
+```
+
 ### `browser`
 
 Opens the lemongrab browser frontend for data exploration
