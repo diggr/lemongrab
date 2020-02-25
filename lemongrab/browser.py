@@ -21,11 +21,12 @@ app.config["CORS_HEADERS"] = "Content-Type"
 
 dataset = CompanyDataset()
 
+
 @app.route("/analysis", methods=["POST"])
 def analysis():
 
     gamelist_file = request.form.getlist("gamelist_file")[0]
-    countries = request.form.getlist("country_dropdown")    
+    countries = request.form.getlist("country_dropdown")
     platforms = request.form.getlist("platform_dropdown")
 
     if not gamelist_file:
@@ -47,8 +48,8 @@ def analysis():
         companies_ratio = 0
 
     return render_template(
-        "analysis.html", 
-        platforms=platforms, 
+        "analysis.html",
+        platforms=platforms,
         countries=countries,
         companies_n=len(data["companies"]),
         most_common=data["companies_most_common"],
@@ -57,13 +58,15 @@ def analysis():
         companies_with_country=data["companies_with_country"],
         companies_country_ratio=companies_ratio,
         production_roles=data["production_roles"],
-        games_table=data["games_table"]
-        )
+        games_table=data["games_table"],
+    )
 
 
 @app.route("/")
 def index():
-    return render_template("index.html", platforms=dataset.platforms, countries=dataset.countries)
+    return render_template(
+        "index.html", platforms=dataset.platforms, countries=dataset.countries
+    )
 
 
 def start_backend():
@@ -71,16 +74,15 @@ def start_backend():
         app.run(debug=DEBUG, port=PORT, use_reloader=False)
     except OSError as e:
         print("Cannot start provis server.")
-        sys.exit(1)  
+        sys.exit(1)
 
 
 def start_webbrowser():
     time.sleep(1)
-    webbrowser.open("http://localhost:{}".format(PORT))        
+    webbrowser.open("http://localhost:{}".format(PORT))
 
 
 def start_browser():
     backend_process = Process(target=start_backend)
     backend_process.start()
     start_webbrowser()
-

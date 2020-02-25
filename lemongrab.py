@@ -13,12 +13,14 @@ except FileNotFoundError:
 
 cli = click.Group()
 
+
 @cli.command()
 def wikidata_mapping():
     """
     Fetch new Wikidata company dataset
     """
     build_wikidata_mapping()
+
 
 @cli.command()
 def company_dataset():
@@ -27,7 +29,9 @@ def company_dataset():
     """
     build_company_dataset(DIGGR_API)
 
+
 if company_dataset_present:
+
     @cli.command()
     def browser():
         """
@@ -37,16 +41,26 @@ if company_dataset_present:
 
 
 @cli.command()
-@click.option("--gamelist", "-g", default=None, help="Filename of a tulpa generated gamelist to be used")
+@click.option(
+    "--gamelist",
+    "-g",
+    default=None,
+    help="Filename of a tulpa generated gamelist to be used",
+)
 @click.option("--country", "-c", multiple=True, default=None, help="Include countries")
-@click.option("--platform", "-p", default=None, help="Include the platforms of the games")
-@click.option("--roles/--no-roles", default=False, help="Include/Exclude roles of a company")
+@click.option(
+    "--platform", "-p", default=None, help="Include the platforms of the games"
+)
+@click.option(
+    "--roles/--no-roles", default=False, help="Include/Exclude roles of a company"
+)
 @click.option("--publisher/--no-publisher", default=False)
 def company_network(gamelist, country, platform, roles, publisher):
     """
     Build company network for Gephi import
     """
     cn = CompanyNetworkBuilder(gamelist, country, platform, roles, publisher)
+
 
 if __name__ == "__main__":
     cli()

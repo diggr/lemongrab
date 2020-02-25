@@ -25,10 +25,13 @@ PROV_DESC = "Contains all items in Wikidata with a Mobygames Company ID (P4773) 
 
 
 def build_wikidata_mapping():
-    sparql = SPARQLWrapper(SPARQL_ENDPOINT, agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')
+    sparql = SPARQLWrapper(
+        SPARQL_ENDPOINT,
+        agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+    )
 
     sparql.setQuery(QUERY)
-    sparql.setReturnFormat(JSON)    
+    sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
 
     dataset = []
@@ -37,23 +40,21 @@ def build_wikidata_mapping():
         if "countryLabel" in binding:
             country = binding["countryLabel"]["value"]
 
-        dataset.append({
-            "mobygames_slug": binding["companyId"]["value"],
-            "country": country,
-            "wkp": binding["item"]["value"].split("/")[-1]
-        })
+        dataset.append(
+            {
+                "mobygames_slug": binding["companyId"]["value"],
+                "country": country,
+                "wkp": binding["item"]["value"].split("/")[-1],
+            }
+        )
 
     print("Wikidata items with Mobygames Company ID: {}".format(len(dataset)))
 
     with open(MAPPING_FILE, "w") as f:
         json.dump(dataset, f, indent=4)
-    
+
     prov = Provenance(MAPPING_FILE, overwrite=True)
-    prov.add(
-        agents = [PROV_AGENT],
-        activity = PROV_ACTIVITY,
-        description = PROV_DESC
-    )
+    prov.add(agents=[PROV_AGENT], activity=PROV_ACTIVITY, description=PROV_DESC)
     prov.add_primary_source("wikidata")
     prov.save()
 
