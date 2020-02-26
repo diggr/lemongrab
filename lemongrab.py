@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 import click
+import json
+
 from lemongrab.wikidata import build_wikidata_mapping
 from lemongrab.company_dataset import build_company_dataset
 from lemongrab.company_network import CompanyNetworkBuilder
+from lemongrab.sample_company_network import SampleCompanyNetwork
 from config import DIGGR_API
 
 company_dataset_present = True
@@ -55,12 +58,18 @@ if company_dataset_present:
     "--roles/--no-roles", default=False, help="Include/Exclude roles of a company"
 )
 @click.option("--publisher/--no-publisher", default=False)
-def company_network(gamelist, country, platform, roles, publisher):
+def company_network(companylist, gamelist, country, platform, roles, publisher):
     """
     Build company network for Gephi import
     """
-    cn = CompanyNetworkBuilder(gamelist, country, platform, roles, publisher)
+    cn = CompanyNetworkBuilder(companylist, gamelist, country, platform, roles, publisher)
 
+@cli.command()
+@click.option("--out", default="company_networks/game_company_network_sample.graphml")
+@click.argument("game_company_sample", type=click.File())
+def game_company_sample_network(out, game_company_sample):
+    scn = SampleCompanyNetwork(json.load(game_company_sample))
+    scn.build_network().save_network(out)
 
 if __name__ == "__main__":
     cli()

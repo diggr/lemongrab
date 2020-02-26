@@ -3,7 +3,7 @@ Builds a game company network based on the company dataset.
 
 Nodes:  game companies (or game companies and their specific production roles (
         e.g. "Nintendo_Developed By", and "Nintendo_Published By"))
-Edges:  Number of games both companies worked on (based on their co-appearence in the 
+Edges:  Number of games both companies worked on (based on their co-appearence in the
         release information)
 
 Additional node information:
@@ -45,9 +45,10 @@ PROV_DESC = "Company graph containing all companies for platforms {platforms} an
 
 
 class CompanyNetworkBuilder:
+
     def company_ids(self, company_id, games):
         """
-        Returns a list of unique ids for a game company when roles should be 
+        Returns a list of unique ids for a game company when roles should be
         considered:
         ["<COMPANY_ID>__<ROLE1>", "<COMPANY_ID>__<ROLE2>", ... ]
         otherwise just returns company id:
@@ -115,7 +116,7 @@ class CompanyNetworkBuilder:
             return ""
 
     def __init__(
-        self, gamelist=None, countries=None, platform=None, roles=False, publisher=False
+        self, companylist=None, gamelist=None, countries=None, platform=None, roles=False, publisher=False
     ):
 
         self.roles = roles
@@ -128,18 +129,24 @@ class CompanyNetworkBuilder:
         print("generating network graph ...")
         games = {}
 
-        self.dataset = CompanyDataset()
-        self.dataset.set_filter([platform], countries)
+        if not companylist:
+            self.dataset = CompanyDataset()
 
-        if not self.gamelist_file:
-            self.dataset.set_filter([platform], countries)
-        else:
-            gamelist = load_gamelist(self.gamelist_file)
-            self.dataset.set_gamelist_filter(gamelist)
+            if not self.gamelist_file:
+                self.dataset.set_filter([platform], countries)
+            else:
+                gamelist = load_gamelist(self.gamelist_file)
+                self.dataset.set_gamelist_filter(gamelist)
 
         company_list = []
-        for company_id, production_roles in self.dataset.filtered_dataset.items():
-            company_list += self.company_ids(company_id, production_roles)
+        if companylist:
+            company_json = json.load(companylist)
+            for game in company_json.values():
+                for company in game:
+                    company_list.append(company["company_id"])
+        else:
+            for company_id, production_roles in self.dataset.filtered_dataset.items():
+                company_list += self.company_ids(company_id, production_roles)
 
         for c in company_list:
             g.add_node(c)

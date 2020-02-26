@@ -134,15 +134,16 @@ class CompanyDataset:
         self.platforms = sorted(list(self.platforms))
         self.countries = sorted(list(self.countries))
 
-    def __init__(self):
-        with open(BASE_DATASET) as f:
+    def __init__(self, base_dataset=BASE_DATASET, slug_mapping=SLUG_MAPPING,
+            wiki_mapping=WIKI_MAPPING):
+        with open(base_dataset) as f:
             self.base_dataset = json.load(f)
 
-        with open(SLUG_MAPPING) as f:
+        with open(slug_mapping) as f:
             data = json.load(f)
         self.slug_map = {x["company_id"]: x["slug"] for x in data}
 
-        with open(WIKI_MAPPING) as f:
+        with open(wiki_mapping) as f:
             data = json.load(f)
         self.country_map = {
             x["mobygames_slug"]: x["country"] for x in data if x["country"]
