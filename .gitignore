@@ -1,3 +1,4 @@
+*.swp
 __pycache__
 datasets/*.prov
 datasets/mobygames_companies.json

@@ -13,8 +13,8 @@ LINKS = "/{dataset}/{id}/links"
 
 ENTRY = "/{dataset}/{id}"
 
-class DiggrApi():
 
+class DiggrApi:
     def _call(self, url):
         try:
             rsp = requests.get(url)
@@ -47,10 +47,10 @@ class DiggrApi():
     def mobygames_slug_to_id(self, slug):
         data = self._call(self.base_url + MG_BY_SLUG.format(slug=slug))
         try:
-            return data["entry"]["id"] 
+            return data["entry"]["id"]
         except:
             print("couldn't retrieve mobygames id for slug {}".format(slug))
-            return None        
+            return None
 
     def __init__(self, base_url):
         self.base_url = base_url
