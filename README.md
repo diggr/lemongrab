@@ -64,6 +64,14 @@ Options which allow multiple invokation (currently country and platform) can be 
 $ python lemongrab.py company-network -c Japan -c Worldwide
 ```
 
+### `game-company-sample-network`
+
+Builds a network of companies based on a tulpa generated company sample.
+
+```zsh
+$ python lemongrab.py game-company-sample-network ../tulpaproject/datasets/tulpa-companies.json
+```
+
 ### `browser`
 
 Opens the lemongrab browser frontend for data exploration
