@@ -116,7 +116,7 @@ class CompanyNetworkBuilder:
             return ""
 
     def __init__(
-        self, companylist=None, gamelist=None, countries=None, platform=None, roles=False, publisher=False
+        self, gamelist=None, countries=None, platform=None, roles=False, publisher=False
     ):
 
         self.roles = roles
@@ -129,24 +129,16 @@ class CompanyNetworkBuilder:
         print("generating network graph ...")
         games = {}
 
-        if not companylist:
-            self.dataset = CompanyDataset()
-
-            if not self.gamelist_file:
-                self.dataset.set_filter([platform], countries)
-            else:
-                gamelist = load_gamelist(self.gamelist_file)
-                self.dataset.set_gamelist_filter(gamelist)
+        self.dataset = CompanyDataset()
+        if not self.gamelist_file:
+            self.dataset.set_filter([platform], countries)
+        else:
+            gamelist = load_gamelist(self.gamelist_file)
+            self.dataset.set_gamelist_filter(gamelist)
 
         company_list = []
-        if companylist:
-            company_json = json.load(companylist)
-            for game in company_json.values():
-                for company in game:
-                    company_list.append(company["company_id"])
-        else:
-            for company_id, production_roles in self.dataset.filtered_dataset.items():
-                company_list += self.company_ids(company_id, production_roles)
+        for company_id, production_roles in self.dataset.filtered_dataset.items():
+            company_list += self.company_ids(company_id, production_roles)
 
         for c in company_list:
             g.add_node(c)

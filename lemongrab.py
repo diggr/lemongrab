@@ -58,11 +58,11 @@ if company_dataset_present:
     "--roles/--no-roles", default=False, help="Include/Exclude roles of a company"
 )
 @click.option("--publisher/--no-publisher", default=False)
-def company_network(companylist, gamelist, country, platform, roles, publisher):
+def company_network(gamelist, country, platform, roles, publisher):
     """
     Build company network for Gephi import
     """
-    cn = CompanyNetworkBuilder(companylist, gamelist, country, platform, roles, publisher)
+    cn = CompanyNetworkBuilder(gamelist, country, platform, roles, publisher)
 
 @cli.command()
 @click.option("--out", default="company_networks/game_company_network_sample.graphml")
