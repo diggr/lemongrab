@@ -54,7 +54,6 @@ class SampleCompanyNetwork:
             c2_games = set(self._filter_games(c2))
 
             overlap = c1_games.intersection(c2_games)
-            all_games = set().union(overlap)
 
             if len(overlap):
                 self.graph.add_edge(c1.company_id, c2.company_id, weight=len(overlap))
