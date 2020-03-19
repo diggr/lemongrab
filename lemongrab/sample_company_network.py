@@ -5,6 +5,7 @@ company sample.
 
 import networkx as nx
 
+from .combined_dataset import CompanyDataset
 from .company_network import PROV_AGENT, PROV_ACTIVITY
 from dataclasses import dataclass
 from itertools import combinations
@@ -25,9 +26,24 @@ class Company:
     game_slug : str
 
 
+def get_wiki_country(c_id, company_dataset, none_return="undefined"):
+    """
+    Returns country information from wikidata for a mobygames company id.
+    If no country is available "undefined" is returned. If None or something
+    else is desired to be returned in case no country is available, this
+    value can be set with the none_return parameter.
+    """
+    slug = company_dataset.slug_map.get(str(c_id), None)
+    if slug:
+        return company_dataset.country_map.get(slug, none_return)
+    else:
+        return none_return
+
+
 class SampleCompanyNetwork:
 
     def __init__(self, game_company_sample):
+        self.company_dataset = CompanyDataset()
         self.games = list(game_company_sample.keys())
         self.companies = [Company(**c) for g in game_company_sample.values() for c in g]
         self.graph = nx.Graph()
@@ -43,10 +59,12 @@ class SampleCompanyNetwork:
     def build_network(self):
 
         for c in self.companies:
-            self.graph.add_node(c.company_id)
-            self.graph.nodes[c.company_id]["label"] = c.company_name
-            self.graph.nodes[c.company_id]["role"] = c.role
-            self.graph.nodes[c.company_id]["platform"] = c.platform
+            c_id = c.company_id
+            self.graph.add_node(c_id)
+            self.graph.nodes[c_id]["label"] = c.company_name
+            self.graph.nodes[c_id]["role"] = c.role
+            self.graph.nodes[c_id]["platform"] = c.platform
+            self.graph.nodes[c_id]["country"] = get_wiki_country(c_id, self.company_dataset)
 
 
         for c1, c2 in tqdm(combinations(self.companies, 2)):
