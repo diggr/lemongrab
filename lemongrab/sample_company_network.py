@@ -61,10 +61,10 @@ class SampleCompanyNetwork:
         for c in self.companies:
             c_id = c.company_id
             self.graph.add_node(c_id)
-            self.graph.nodes[c_id]["label"] = c.company_name
             self.graph.nodes[c_id]["role"] = c.role
             self.graph.nodes[c_id]["platform"] = c.platform
             self.graph.nodes[c_id]["country"] = get_wiki_country(c_id, self.company_dataset)
+            self.graph.nodes[c_id]["name"] = c.company_name
 
 
         for c1, c2 in tqdm(combinations(self.companies, 2)):
