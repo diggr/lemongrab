@@ -7,6 +7,7 @@ from lemongrab.company_dataset import build_company_dataset
 from lemongrab.company_network import CompanyNetworkBuilder
 from lemongrab.sample_company_network import SampleCompanyNetwork
 from config import DIGGR_API
+from pathlib import Path
 
 company_dataset_present = True
 try:
@@ -68,6 +69,9 @@ def company_network(gamelist, country, platform, roles, publisher):
 @click.option("--out", default="company_networks/game_company_network_sample.graphml")
 @click.argument("game_company_sample", type=click.File())
 def game_company_sample_network(out, game_company_sample):
+    out_folder = Path(out).resolve().parent
+    if not out_folder.is_dir():
+        out_folder.mkdir(parents=True)
     scn = SampleCompanyNetwork(json.load(game_company_sample))
     scn.build_network().save_network(out)
 
