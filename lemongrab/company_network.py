@@ -183,16 +183,16 @@ class CompanyNetworkBuilder:
 
             g.nodes[node]["country"] = self._get_wiki_country(id_)
             if self.roles:
+                g.nodes[node]["company_name"] = self.dataset.filtered_dataset[id_][0][
+                    "company_name"
+                ]
+                g.nodes[node]["role"] = role
                 g.nodes[node]["label"] = (
                     self.dataset.filtered_dataset[id_][0]["company_name"]
                     + "("
                     + role
                     + ")"
                 )
-                g.nodes[node]["company_name"] = self.dataset.filtered_dataset[id_][0][
-                    "company_name"
-                ]
-                g.nodes[node]["role"] = role
             else:
                 g.nodes[node]["label"] = self.dataset.filtered_dataset[id_][0][
                     "company_name"
