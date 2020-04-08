@@ -13,7 +13,7 @@ class CombinedDataset:
     dataset.set_filter(platforms, countries)
     overview = dataset.get_overview()
     """
-    def __init__(self, mobygames_companies, id_2_slug, wikidata_mapping)
+    def __init__(self, mobygames_companies, id_2_slug, wikidata_mapping):
         self.base_dataset = mobygames_companies
         self.slug_map = {x["company_id"]: x["slug"] for x in id_2_slug}
         self.country_map = {
