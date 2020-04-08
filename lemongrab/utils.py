@@ -1,4 +1,16 @@
+import json
 import yaml
+
+
+def write_json(data, outfilename):
+    with open(outfilename, "w") as outfile:
+        json.dump(data, outfile, indent=4)
+    return filename
+
+
+def read_json(infilename):
+    with open(infilename, "w") as infile:
+        return json.load(infile)
 
 
 def load_gamelist(gamelist_file):

@@ -5,7 +5,7 @@ from multiprocessing import Process
 from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, render_template, request
 
-from .combined_dataset import CompanyDataset
+from .combined_dataset import get_combined_dataset
 from .utils import load_gamelist
 
 """
@@ -19,7 +19,7 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config["CORS_HEADERS"] = "Content-Type"
 
-dataset = CompanyDataset()
+dataset = get_combined_dataset()
 
 
 @app.route("/analysis", methods=["POST"])

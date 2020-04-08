@@ -5,6 +5,7 @@ DATASETS_DIR = "lemongrab_datasets"
 COMPANY_NETWORKS_DIR = "company_networks"
 WIKIDATA_MAPPING_FILENAME = "wikidata_mapping.json"
 MOBYGAMES_COMPANIES_FILENAME = "mobygames_companies.json"
+ID_2_SLUG_FILENAME = "mobygames_id_to_slug.json"
 
 SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
 SPARQL_AGENT = "lemongrab of diggr.link"
@@ -25,4 +26,9 @@ WIKIDATA_PROV_DESC = "Contains all items in Wikidata with a Mobygames Company ID
 COMPANIES_PROV_ACTIVITY = "build_companies_dataset"
 COMPANIES_PROV_DESC = "Dataset containing all companies in mobygames and their corresponding game/release information"
 
+NETWORK_PROV_ACTIVITY = "build_company_network"
+NETWORK_PROV_DESC = f"Company graph containing all companies for platforms {platforms} and release countries {countries}"
+
+SAMPLE_PROV_ACTIVITY = "draw_company_sample"
+SAMPLE_PROV_DESC = "Build company network based on tulpa exported sample"
 

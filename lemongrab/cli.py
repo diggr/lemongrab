@@ -53,9 +53,8 @@ def mobygames_companies(unified_api_url):
     Build new company dataset from the Mobygames dataset
     """
     print("Building company dataset...")
-    build_mobygames_companies(unified_api_url)
-    print(f"Mapped {n_entries} wikidata items with Mobygames Company ID.")
-    print(f"Mapping file saved as: {mapping_filename}")
+    mobygames_companies_filename = build_mobygames_companies(unified_api_url)
+    print(f"Mobygames companies file saved as: {mobygames_companies_filename}")
 
 
 @build.command()

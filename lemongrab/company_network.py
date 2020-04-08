@@ -1,119 +1,38 @@
-"""
-Builds a game company network based on the company dataset.
-
-Nodes:  game companies (or game companies and their specific production roles (
-        e.g. "Nintendo_Developed By", and "Nintendo_Published By"))
-Edges:  Number of games both companies worked on (based on their co-appearence in the
-        release information)
-
-Additional node information:
-* label
-* country information based on wikidata dataset
-* num_of_games: number of games the company worked on, within the filtered dataset
-
-
-Filter options:
-
-* countries: resease country (can be multiple)
-* platform (can be multiple)
-
-"""
-
 import networkx as nx
 import json
 import yaml
 import os
-from tqdm import tqdm
+
 from collections import defaultdict
+from .combined_dataset import get_combined_dataset
 from itertools import combinations
 from pathlib import Path
 from provit import Provenance
-
-from .combined_dataset import CompanyDataset
 from .utils import load_gamelist
-
-OUT_DIR = "company_networks"
-
-COMPANY_DATASET = "datasets/mobygames_companies.json"
-WIKIDATA_MAPPING = "datasets/wikidata_mapping.json"
-ID_2_SLUG = "datasets/mobygames_companies_id_to_slug.json"
-
-# provenance infomration
-PROV_AGENT = "lemongrab.py"
-PROV_ACTIVITY = "build_company_network"
-PROV_DESC = "Company graph containing all companies for platforms {platforms} and release countries {countries}"
+from tqdm import tqdm
 
 
 class CompanyNetworkBuilder:
+    """
+    Builds a game company network based on the company dataset.
 
-    def company_ids(self, company_id, games):
-        """
-        Returns a list of unique ids for a game company when roles should be
-        considered:
-        ["<COMPANY_ID>__<ROLE1>", "<COMPANY_ID>__<ROLE2>", ... ]
-        otherwise just returns company id:
-        ["COMPANY_ID"]
-        """
-        ids = []
-        if self.roles:
-            roles = set([x["production_role"] for x in games])
-            for role in roles:
-                if not self.publisher and role == "Published by":
-                    continue
+    Nodes:  game companies (or game companies and their specific production roles (
+            e.g. "Nintendo_Developed By", and "Nintendo_Published By"))
+    Edges:  Number of games both companies worked on (based on their co-appearence in the
+            release information)
 
-                ids.append("{}__{}".format(company_id, role))
-            return ids
-        else:
-            return [company_id]
+    Additional node information:
+    * label
+    * country information based on wikidata dataset
+    * num_of_games: number of games the company worked on, within the filtered dataset
 
-    def _filter_games(self, ds, countries, platform, role):
-        """
-        Returns a list of all games a company worked on based on filter criterias countries, platform and role
-        """
-        if countries:
-            ds = [
-                x
-                for x in ds
-                if len(set(x["release_countries"]).intersection(set(countries))) > 0
-            ]
-        if platform:
-            ds = [x for x in ds if platform == x["platform"]]
-        if role:
-            ds = [x for x in ds if x["production_role"] == role]
 
-        return set([x["game_slug"] for x in ds])
+    Filter options:
 
-    def _get_wiki_country(self, company_id):
-        """
-        Returns country information from wikidata for a mobygames compnay id :company_id:
-        Returns "undefined" if no country information is available
-        """
-        slug = self.dataset.slug_map[company_id]
-        country = ""
-        if slug in self.dataset.country_map:
-            country = self.dataset.country_map[slug]
-        if country:
-            return country
-        else:
-            return "undefined"
+    * countries: resease country (can be multiple)
+    * platform (can be multiple)
 
-    def countries_str(self, countries):
-        """
-        Returns a somewhat normalized country string.
-        """
-        if countries:
-            return "_".join(countries).replace(" ", "_")
-        else:
-            return ""
-
-    def platform_str(self, platform):
-        """
-        Returns a somewhat normalized platform string.
-        """
-        if platform:
-            return platform.replace(" ", "_")
-        else:
-            return ""
+    """
 
     def __init__(
         self, gamelist=None, countries=None, platform=None, roles=False, publisher=False
@@ -129,7 +48,7 @@ class CompanyNetworkBuilder:
         print("generating network graph ...")
         games = {}
 
-        self.dataset = CompanyDataset()
+        self.dataset = get_combined_dataset()
         if not self.gamelist_file:
             self.dataset.set_filter([platform], countries)
         else:
@@ -234,3 +153,74 @@ class CompanyNetworkBuilder:
             ),
         )
         prov.save()
+
+    def company_ids(self, company_id, games):
+        """
+        Returns a list of unique ids for a game company when roles should be
+        considered:
+        ["<COMPANY_ID>__<ROLE1>", "<COMPANY_ID>__<ROLE2>", ... ]
+        otherwise just returns company id:
+        ["COMPANY_ID"]
+        """
+        ids = []
+        if self.roles:
+            roles = set([x["production_role"] for x in games])
+            for role in roles:
+                if not self.publisher and role == "Published by":
+                    continue
+
+                ids.append("{}__{}".format(company_id, role))
+            return ids
+        else:
+            return [company_id]
+
+    def _filter_games(self, ds, countries, platform, role):
+        """
+        Returns a list of all games a company worked on based on filter criterias countries, platform and role
+        """
+        if countries:
+            ds = [
+                x
+                for x in ds
+                if len(set(x["release_countries"]).intersection(set(countries))) > 0
+            ]
+        if platform:
+            ds = [x for x in ds if platform == x["platform"]]
+        if role:
+            ds = [x for x in ds if x["production_role"] == role]
+
+        return set([x["game_slug"] for x in ds])
+
+    def _get_wiki_country(self, company_id):
+        """
+        Returns country information from wikidata for a mobygames compnay id :company_id:
+        Returns "undefined" if no country information is available
+        """
+        slug = self.dataset.slug_map[company_id]
+        country = ""
+        if slug in self.dataset.country_map:
+            country = self.dataset.country_map[slug]
+        if country:
+            return country
+        else:
+            return "undefined"
+
+    def countries_str(self, countries):
+        """
+        Returns a somewhat normalized country string.
+        """
+        if countries:
+            return "_".join(countries).replace(" ", "_")
+        else:
+            return ""
+
+    def platform_str(self, platform):
+        """
+        Returns a somewhat normalized platform string.
+        """
+        if platform:
+            return platform.replace(" ", "_")
+        else:
+            return ""
+
+
