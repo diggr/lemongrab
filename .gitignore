@@ -1,3 +1,5 @@
+.coverage
+coverage.xml
 *.egg-info/*
 *.swp
 __pycache__

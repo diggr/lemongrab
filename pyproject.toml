@@ -19,6 +19,8 @@ provit = "^1.1.1"
 diggrtoolbox = {git = "https://github.com/diggr/diggrtoolbox", rev = "master"}
 
 [tool.poetry.dev-dependencies]
+pytest = "^5.4.1"
+pytest-cov = "^2.8.1"
 
 [build-system]
 requires = ["poetry>=0.12"]

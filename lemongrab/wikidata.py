@@ -1,6 +1,6 @@
 """
 Builds a local dataset with country information of all videogame companies
-with a mobygames id in wikidata. 
+with a mobygames id in wikidata.
 """
 
 from SPARQLWrapper import SPARQLWrapper, JSON
@@ -11,7 +11,7 @@ SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
 QUERY = """
 SELECT ?item ?itemLabel ?countryLabel ?companyId
 {
-  ?item wdt:P4773 ?companyId. 
+  ?item wdt:P4773 ?companyId.
   OPTIONAL { ?item wdt:P17 ?country. }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
