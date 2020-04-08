@@ -2,13 +2,7 @@ import json
 
 from tqdm import tqdm
 from collections import Counter, defaultdict
-from .settings import (
-    DATASETS_DIR,
-    MOBYGAMES_COMPANIES_FILENAME,
-    ID_2_SLUG_FILENAME,
-    WIKIDATA_MAPPING
-)
-from .utils import read_json
+from .utils import get_datasets
 
 class CombinedDataset:
     """
@@ -148,7 +142,5 @@ def get_combined_dataset():
     """
     Factory which returns an instance of CombinedDataset.
     """
-    mobygames_companies = read_json(Path(DATASETS_DIR) / MOBYGAMES_COMPANIES_FILENAME)
-    id_2_slug = read_json(Path(DATASETS_DIR) / ID_2_SLUG_FILENAME)
-    wikidata_mapping = read_json(Path(DATASETS_DIR) / WIKIDATA_MAPPING_FILENAME)
+    mobygames_companies, id_2_slug, wikidata_mapping = get_datasets()
     return CombinedDataset(mobygames_companies, id_2_slug, wikidata_mapping)
