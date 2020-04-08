@@ -5,7 +5,7 @@ import yaml
 
 from .wikidata import build_wikidata_mapping
 from .company_dataset import build_mobygames_companies
-from .company_network import CompanyNetworkBuilder
+from .company_network import build_company_network
 from .sample_company_network import SampleCompanyNetwork
 from .settings import DIGGR_API, DATASETS_DIR, COMPANY_NETWORKS_DIR
 from pathlib import Path
@@ -98,7 +98,7 @@ def company_network(gamelist, country, platform, roles, publisher):
     Build company network for Gephi import
     """
     print("Building company network...")
-    out_file, n_nodes, n_edges, n_games = CompanyNetworkBuilder(
+    out_file, n_nodes, n_edges, n_games = build_company_network(
         gamelist,
         country,
         platform,

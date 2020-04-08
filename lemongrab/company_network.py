@@ -12,6 +12,7 @@ from .settings import (
     COMPANY_NETWORKS_DIR,
     NETWORK_PROV_ACTIVITY,
     NETWORK_PROV_DESC,
+    PROV_AGENT
 )
 from .utils import load_gamelist
 from tqdm import tqdm
@@ -54,9 +55,7 @@ class CompanyNetworkBuilder:
         self.publisher = publisher
         self.gamelist_file = gamelist
 
-        self._build()
-
-    def _build(self):
+    def build(self):
 
         g = nx.Graph()
         all_games = set()
@@ -133,15 +132,15 @@ class CompanyNetworkBuilder:
                 ]
             g.nodes[node]["no_of_games"] = len(games[node])
 
-        out_path = Path(COMANY_NETWORKS_DIR)
+        out_path = Path(COMPANY_NETWORKS_DIR)
         out_filename = "company_network_"
 
         if self.gamelist_file:
             project_name = self.gamelist_file.split("/")[-1].replace(".yml", "")
             out_filename += project_name
         else:
-            out_filename += self.countries_str(countries)
-            out_filename += "_" + self.platform_str(platform)
+            out_filename += self.countries_str(self.countries)
+            out_filename += "_" + self.platform_str(self.platform)
         if self.roles:
             out_filename += "_roles"
         if self.publisher:
@@ -156,18 +155,17 @@ class CompanyNetworkBuilder:
             agents=[PROV_AGENT],
             activity=NETWORK_PROV_ACTIVITY,
             description=NETWORK_PROV_DESC.format(
-                platforms=self.platform_str(platform),
-                countries=self.countries_str(countries),
+                platforms=self.platform_str(self.platform),
+                countries=self.countries_str(self.countries),
             ),
         )
         prov.save()
 
-        _write_log(out_file, len(g.nodes), len(g.edges), len(all_games))
+        self._write_log(out_file, len(g.nodes), len(g.edges), len(all_games))
 
         return out_file, len(g.nodes), len(g.edges), len(all_games)
 
-    @staticmethod
-    def _write_log(out_file, n_nodes, n_edges, n_games):
+    def _write_log(self, out_file, n_nodes, n_edges, n_games):
         with open(f"{out_file}.log", "w") as outfile:
             yaml.dump({
                 "nodes" : n_nodes,
@@ -244,4 +242,16 @@ class CompanyNetworkBuilder:
         else:
             return ""
 
-
+def build_company_network(
+        gamelist=None,
+        countries=None,
+        platform=None,
+        roles=False,
+        publisher=False
+    ):
+    """
+    CompanyNetworkBuilder factory which runs the build
+    and returns stats about the result.
+    """
+    cn_builder = CompanyNetworkBuilder(gamelist, countries, platform, roles, publisher)
+    return cn_builder.build()
