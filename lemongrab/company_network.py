@@ -49,6 +49,8 @@ class CompanyNetworkBuilder:
     ):
 
         self.roles = roles
+        self.countries = countries
+        self.platform = platform
         self.publisher = publisher
         self.gamelist_file = gamelist
 
@@ -63,7 +65,7 @@ class CompanyNetworkBuilder:
 
         self.dataset = get_combined_dataset()
         if not self.gamelist_file:
-            self.dataset.set_filter([platform], countries)
+            self.dataset.set_filter([self.platform], self.countries)
         else:
             gamelist = load_gamelist(self.gamelist_file)
             self.dataset.set_gamelist_filter(gamelist)
@@ -89,14 +91,14 @@ class CompanyNetworkBuilder:
 
             if c1 not in games:
                 games[c1] = self._filter_games(
-                    self.dataset.filtered_dataset[c1_id], countries, platform, c1_role
+                    self.dataset.filtered_dataset[c1_id], self.countries, self.platform, c1_role
                 )
             else:
                 c1_games = games[c1]
 
             if c2 not in games:
                 games[c2] = self._filter_games(
-                    self.dataset.filtered_dataset[c2_id], countries, platform, c2_role
+                    self.dataset.filtered_dataset[c2_id], self.countries, self.platform, c2_role
                 )
             else:
                 c2_games = games[c2]
