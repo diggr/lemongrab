@@ -1,32 +1,9 @@
-"""
-Builds a reduced local company dataset from the unified api mobygames dataset.
-
-The dataset is dictionary with the (mobygames) company id as its key, and a list of
-the production roles for all the games the company was involved in.
-
-<company_id>: [ <game_1_prod_info_1>, <game_1_prod_info_2>, <game_3_prod_info_1> , ... ]
-
-
-The production information contain the data points:
-
-Company-specific information:
-* company_name
-* production role
-
-Game-specific information:
-* game_id
-* game_slug
-* game_title
-* game_years
-* release_countries
-* platform
-
-"""
+import diggrtoolbox as dt
 import json
 
 from collections import defaultdict
 from .diggr_api import DiggrApi
-import diggrtoolbox as dt
+from pathlib import Path
 from provit import Provenance
 from .settings import (
     DATASETS_DIR,
@@ -40,7 +17,29 @@ from tqdm import tqdm
 
 
 def build_mobygames_companies(unified_api_url=DIGGR_API):
+    """
+    Builds a reduced local company dataset from the unified api mobygames dataset.
 
+    The dataset is dictionary with the (mobygames) company id as its key, and a list of
+    the production roles for all the games the company was involved in.
+
+    <company_id>: [ <game_1_prod_info_1>, <game_1_prod_info_2>, <game_3_prod_info_1> , ... ]
+
+
+    The production information contain the data points:
+
+    Company-specific information:
+    * company_name
+    * production role
+
+    Game-specific information:
+    * game_id
+    * game_slug
+    * game_title
+    * game_years
+    * release_countries
+    * platform
+    """
     api = DiggrApi(unified_api_url)
     pm = dt.PlatformMapper("mobygames")
 
@@ -66,14 +65,18 @@ def build_mobygames_companies(unified_api_url=DIGGR_API):
                         }
                     )
 
-    mobygames_companies_filename = Path(DATASETS_DIR) / MOBYGAMES_COMPANIES_FILENAME
-    with open(OUT_FILE, "w") as f:
+    mg_companies_filename = Path(DATASETS_DIR) / MOBYGAMES_COMPANIES_FILENAME
+    with open(mg_companies_filename, "w") as f:
         json.dump(dict(dataset), f, indent=4)
 
-    prov = Provenance(OUT_FILE, overwrite=True)
-    prov.add(agents=[PROV_AGENT], activity=PROV_ACTIVITY, description=PROV_DESC)
+    prov = Provenance(mg_companies_filename, overwrite=True)
+    prov.add(
+        agents=[PROV_AGENT],
+        activity=COMPANIES_PROV_ACTIVITY,
+        description=COMPANIES_PROV_DESC
+    )
     prov.add_primary_source("mobygames")
     prov.add_primary_source("diggr_platform_mapping")
     prov.save()
 
-    return mobygames_companies_filename
+    return mg_companies_filename

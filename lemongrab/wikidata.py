@@ -1,7 +1,3 @@
-"""
-Builds a local dataset with country information of all videogame companies
-with a mobygames id in wikidata.
-"""
 import json
 
 from SPARQLWrapper import SPARQLWrapper, JSON
