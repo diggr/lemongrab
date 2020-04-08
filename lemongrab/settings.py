@@ -5,7 +5,7 @@ DATASETS_DIR = "lemongrab_datasets"
 COMPANY_NETWORKS_DIR = "company_networks"
 WIKIDATA_MAPPING_FILENAME = "wikidata_mapping.json"
 MOBYGAMES_COMPANIES_FILENAME = "mobygames_companies.json"
-ID_2_SLUG_FILENAME = "mobygames_id_to_slug.json"
+ID_2_SLUG_FILENAME = "mobygames_companies_id_to_slug.json"
 
 SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
 SPARQL_AGENT = "lemongrab of diggr.link"
