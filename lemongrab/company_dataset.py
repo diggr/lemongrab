@@ -22,24 +22,26 @@ Game-specific information:
 * platform
 
 """
-
 import json
-import diggrtoolbox as dt
+
 from collections import defaultdict
-from tqdm import tqdm
-from provit import Provenance
 from .diggr_api import DiggrApi
+import diggrtoolbox as dt
+from provit import Provenance
+from .settings import (
+    DATASETS_DIR,
+    DIGGR_API,
+    MOBYGAMES_COMPANIES_FILENAME,
+    COMPANIES_PROV_ACTIVITY,
+    COMPANIES_PROV_DESC,
+    PROV_AGENT,
+)
+from tqdm import tqdm
 
-OUT_FILE = "datasets/mobygames_companies.json"
 
-PROV_AGENT = "lemongrab.py"
-PROV_ACTIVITY = "build_companies_dataset"
-PROV_DESC = "Dataset containing all companies in mobygames and their corresponding game/release information"
+def build_mobygames_companies(unified_api_url=DIGGR_API):
 
-
-def build_company_dataset(api):
-
-    api = DiggrApi(api)
+    api = DiggrApi(unified_api_url)
     pm = dt.PlatformMapper("mobygames")
 
     dataset = defaultdict(list)
@@ -64,7 +66,7 @@ def build_company_dataset(api):
                         }
                     )
 
-    print("Save company dataset as: {}".format(OUT_FILE))
+    mobygames_companies_filename = Path(DATASETS_DIR) / MOBYGAMES_COMPANIES_FILENAME
     with open(OUT_FILE, "w") as f:
         json.dump(dict(dataset), f, indent=4)
 
@@ -73,3 +75,5 @@ def build_company_dataset(api):
     prov.add_primary_source("mobygames")
     prov.add_primary_source("diggr_platform_mapping")
     prov.save()
+
+    return mobygames_companies_filename
