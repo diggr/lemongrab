@@ -8,6 +8,11 @@ from .combined_dataset import get_combined_dataset
 from itertools import combinations
 from pathlib import Path
 from provit import Provenance
+from .settings import (
+    COMPANY_NETWORKS_DIR,
+    NETWORK_PROV_ACTIVITY,
+    NETWORK_PROV_DESC,
+)
 from .utils import load_gamelist
 from tqdm import tqdm
 
@@ -35,17 +40,25 @@ class CompanyNetworkBuilder:
     """
 
     def __init__(
-        self, gamelist=None, countries=None, platform=None, roles=False, publisher=False
+        self,
+        gamelist=None,
+        countries=None,
+        platform=None,
+        roles=False,
+        publisher=False
     ):
 
         self.roles = roles
         self.publisher = publisher
         self.gamelist_file = gamelist
 
+        self._build()
+
+    def _build(self):
+
         g = nx.Graph()
         all_games = set()
 
-        print("generating network graph ...")
         games = {}
 
         self.dataset = get_combined_dataset()
@@ -118,9 +131,7 @@ class CompanyNetworkBuilder:
                 ]
             g.nodes[node]["no_of_games"] = len(games[node])
 
-        out_path = Path(OUT_DIR)
-        if not out_path.is_dir():
-            out_path.mkdir()
+        out_path = Path(COMANY_NETWORKS_DIR)
         out_filename = "company_network_"
 
         if self.gamelist_file:
@@ -133,26 +144,34 @@ class CompanyNetworkBuilder:
             out_filename += "_roles"
         if self.publisher:
             out_filename += "_pub"
+
         out_filename += ".graphml"
-
         out_file = out_path / out_filename
-
-        print("\nNetwork file saved as: {}n".format(out_file))
         nx.write_graphml(g, out_file)
-        print("Nodes in network: {}".format(len(g.nodes)))
-        print("Edges in network: {}".format(len(g.edges)))
-        print("Games: {}".format(len(all_games)))
 
         prov = Provenance(out_file)
         prov.add(
             agents=[PROV_AGENT],
-            activity=PROV_ACTIVITY,
-            description=PROV_DESC.format(
+            activity=NETWORK_PROV_ACTIVITY,
+            description=NETWORK_PROV_DESC.format(
                 platforms=self.platform_str(platform),
                 countries=self.countries_str(countries),
             ),
         )
         prov.save()
+
+        _write_log(out_file, len(g.nodes), len(g.edges), len(all_games))
+
+        return out_file, len(g.nodes), len(g.edges), len(all_games)
+
+    @staticmethod
+    def _write_log(out_file, n_nodes, n_edges, n_games):
+        with open(f"{out_file}.log", "w") as outfile:
+            yaml.dump({
+                "nodes" : n_nodes,
+                "edges" : n_edges,
+                "games" : n_games
+            }, outfile)
 
     def company_ids(self, company_id, games):
         """

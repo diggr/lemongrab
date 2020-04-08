@@ -31,7 +31,7 @@ COMPANIES_PROV_ACTIVITY = "build_companies_dataset"
 COMPANIES_PROV_DESC = "Dataset containing all companies in mobygames and their corresponding game/release information"
 
 NETWORK_PROV_ACTIVITY = "build_company_network"
-NETWORK_PROV_DESC = f"Company graph containing all companies for platforms {platforms} and release countries {countries}"
+NETWORK_PROV_DESC = "Company graph containing all companies for platforms {platforms} and release countries {countries}"
 
 SAMPLE_PROV_ACTIVITY = "draw_company_sample"
 SAMPLE_PROV_DESC = "Build company network based on tulpa exported sample"

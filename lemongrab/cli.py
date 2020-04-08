@@ -97,7 +97,19 @@ def company_network(gamelist, country, platform, roles, publisher):
     """
     Build company network for Gephi import
     """
-    cn = CompanyNetworkBuilder(gamelist, country, platform, roles, publisher)
+    print("Building company network...")
+    out_file, n_nodes, n_edges, n_games = CompanyNetworkBuilder(
+        gamelist,
+        country,
+        platform,
+        roles,
+        publisher
+    )
+    print(f"Network file saved as: {out_file}")
+    print(f"Nodes in network: {n_nodes}")
+    print(f"Edges in network: {n_edges}")
+    print(f"Games: {n_games}")
+
 
 @cli.command()
 @click.option("--out", default="company_networks/game_company_network_sample.graphml")
