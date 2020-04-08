@@ -2,11 +2,11 @@
 import click
 import json
 
-from lemongrab.wikidata import build_wikidata_mapping
-from lemongrab.company_dataset import build_company_dataset
-from lemongrab.company_network import CompanyNetworkBuilder
-from lemongrab.sample_company_network import SampleCompanyNetwork
-from config import DIGGR_API
+from .wikidata import build_wikidata_mapping
+from .company_dataset import build_company_dataset
+from .company_network import CompanyNetworkBuilder
+from .sample_company_network import SampleCompanyNetwork
+from .settings import DIGGR_API
 from pathlib import Path
 
 company_dataset_present = True
@@ -74,6 +74,3 @@ def game_company_sample_network(out, game_company_sample):
         out_folder.mkdir(parents=True)
     scn = SampleCompanyNetwork(json.load(game_company_sample))
     scn.build_network().save_network(out)
-
-if __name__ == "__main__":
-    cli()
