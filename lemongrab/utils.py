@@ -1,6 +1,7 @@
 import json
 import yaml
 
+from pathlib import Path
 from .settings import (
     DATASETS_DIR,
     ID_2_SLUG_FILENAME,
@@ -16,12 +17,12 @@ def write_json(data, outfilename):
 
 
 def read_json(infilename):
-    with open(infilename, "w") as infile:
+    with open(infilename) as infile:
         return json.load(infile)
 
 
 def read_yaml(infilename):
-    with open(infilename, "w") as infile:
+    with open(infilename) as infile:
         return yaml.safe_load(infile)
 
 
