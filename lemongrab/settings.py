@@ -18,6 +18,10 @@ SELECT ?item ?itemLabel ?countryLabel ?companyId
 }
 """
 
+BROWSER_DEBUG = True
+BROWSER_PORT = 8228
+
+
 PROV_AGENT = "lemongrab"
 
 WIKIDATA_PROV_ACTIVITY = "build_wikidata_mapping"

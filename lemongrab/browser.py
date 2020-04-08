@@ -1,19 +1,19 @@
-import sys
-import time
-import webbrowser
-from multiprocessing import Process
-from flask_cors import CORS, cross_origin
-from flask import Flask, jsonify, render_template, request
-
-from .combined_dataset import get_combined_dataset
-from .utils import load_gamelist
-
 """
 Simple browser application for exploring the game companies dataset
 """
+import sys
+import time
+import webbrowser
 
-DEBUG = True
-PORT = 8228
+from multiprocessing import Process
+from flask_cors import CORS, cross_origin
+from flask import Flask, jsonify, render_template, request
+from .combined_dataset import get_combined_dataset
+from .settings import (
+    BROWSER_DEBUG,
+    BROWSER_PORT
+)
+from .utils import load_gamelist
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -71,7 +71,7 @@ def index():
 
 def start_backend():
     try:
-        app.run(debug=DEBUG, port=PORT, use_reloader=False)
+        app.run(debug=BROWSER_DEBUG, port=BROWSER_PORT, use_reloader=False)
     except OSError as e:
         print("Cannot start provis server.")
         sys.exit(1)
@@ -79,7 +79,7 @@ def start_backend():
 
 def start_webbrowser():
     time.sleep(1)
-    webbrowser.open("http://localhost:{}".format(PORT))
+    webbrowser.open("http://localhost:{}".format(BROWSER_PORT))
 
 
 def start_browser():
