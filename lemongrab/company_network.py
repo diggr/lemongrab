@@ -166,7 +166,7 @@ class CompanyNetworkBuilder:
         return out_file, len(g.nodes), len(g.edges), len(all_games)
 
     def _write_log(self, out_file, n_nodes, n_edges, n_games):
-        with open(f"{out_file}.log", "w") as outfile:
+        with open(f"{out_file}_log.yaml", "w") as outfile:
             yaml.dump({
                 "nodes" : n_nodes,
                 "edges" : n_edges,
