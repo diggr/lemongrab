@@ -13,6 +13,7 @@ from .settings import (
     WIKIDATA_PROV_ACTIVITY,
     WIKIDATA_PROV_DESC,
 )
+from urllib.error import URLError
 
 def build_wikidata_mapping():
     """
@@ -26,7 +27,10 @@ def build_wikidata_mapping():
 
     sparql.setQuery(SPARQL_QUERY)
     sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()
+    try:
+        results = sparql.query().convert()
+    except URLError:
+        raise RuntimeError("Error while fetching data from wikidata... No file written!")
 
     dataset = []
     for binding in results["results"]["bindings"]:

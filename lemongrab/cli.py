@@ -2,6 +2,7 @@
 import click
 import json
 import yaml
+import sys
 
 from .wikidata import build_wikidata_mapping
 from .company_dataset import build_mobygames_companies
@@ -49,7 +50,12 @@ def wikidata_mapping():
     Fetch new Wikidata company dataset
     """
     print("Building wikidata mapping ...")
-    n_entries, mapping_filename = build_wikidata_mapping()
+
+    try:
+        n_entries, mapping_filename = build_wikidata_mapping()
+    except RuntimeError as e:
+        sys.exit(e)
+
     print(f"Mapped {n_entries} wikidata items with Mobygames Company ID.")
     print(f"Mapping file saved as: {mapping_filename}")
 
