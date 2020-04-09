@@ -9,7 +9,7 @@ license = "GPL-3.0"
 lemongrab = "lemongrab.cli:cli"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 tqdm = "^4.45.0"
 requests = "^2.23.0"
 Click = "7.0"
