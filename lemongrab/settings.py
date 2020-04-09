@@ -1,11 +1,17 @@
 import os
 
+from pathlib import Path
+
+
 DIGGR_API = os.environ.get("DIGGR_API", "http://127.0.0.1:6660")
 DATASETS_DIR = "lemongrab_datasets"
 COMPANY_NETWORKS_DIR = "company_networks"
 WIKIDATA_MAPPING_FILENAME = "wikidata_mapping.json"
 MOBYGAMES_COMPANIES_FILENAME = "mobygames_companies.json"
 ID_2_SLUG_FILENAME = "mobygames_companies_id_to_slug.json"
+
+BASE_PATH = Path(__file__).resolve().parent
+ID_2_SLUG_PATH = BASE_PATH / "datasets" / ID_2_SLUG_FILENAME
 
 SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
 SPARQL_AGENT = "lemongrab of diggr.link"

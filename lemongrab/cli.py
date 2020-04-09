@@ -6,9 +6,16 @@ import yaml
 from .wikidata import build_wikidata_mapping
 from .company_dataset import build_mobygames_companies
 from .company_network import build_company_network
-from .sample_company_network import SampleCompanyNetwork
-from .settings import DIGGR_API, DATASETS_DIR, COMPANY_NETWORKS_DIR
 from pathlib import Path
+from .sample_company_network import SampleCompanyNetwork
+from .settings import (
+    DIGGR_API,
+    DATASETS_DIR,
+    COMPANY_NETWORKS_DIR,
+    ID_2_SLUG_FILENAME,
+    ID_2_SLUG_PATH,
+)
+from shutil import copyfile
 
 company_dataset_present = True
 try:
@@ -26,6 +33,7 @@ def init():
     print(f"Initialize lemongrab project...")
     Path(DATASETS_DIR).mkdir()
     Path(COMPANY_NETWORKS_DIR).mkdir()
+    copyfile(ID_2_SLUG_PATH, Path(DATASETS_DIR) / ID_2_SLUG_FILENAME)
     print(f"Finished.")
 
 
