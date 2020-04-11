@@ -25,7 +25,15 @@ try:
 except FileNotFoundError:
     company_dataset_present = False
 
-cli = click.Group()
+@click.group()
+def cli():
+    """
+    Gather company data from mobygames and wikidata and build awesome research
+    datasets and visualizations.This tool provides various commands to fetch data
+    (via cli) and visualize it (via browser).
+    """
+    pass
+
 
 @cli.command()
 def init():
@@ -130,6 +138,9 @@ def company_network(gamelist, country, platform, roles, publisher):
 @click.option("--out", default="company_networks/game_company_network_sample.graphml")
 @click.argument("game_company_sample", type=click.File())
 def game_company_sample_network(out, game_company_sample):
+    """
+    Builds a company network from a sample.
+    """
     out_folder = Path(out).resolve().parent
     if not out_folder.is_dir():
         out_folder.mkdir(parents=True)
@@ -139,6 +150,9 @@ def game_company_sample_network(out, game_company_sample):
 @cli.command()
 @click.option("--out", default="lemongrab_logs.csv")
 def aggregate_logs(out):
+    """
+    Aggregates all logs of the current project into a CSV file.
+    """
     outfilename, used_logs = build_aggregated_logs(out)
     print(f"Aggregates logs saved as: {outfilename}")
     print(f"Used log files:")
