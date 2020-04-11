@@ -4,6 +4,8 @@ from pathlib import Path
 
 
 DIGGR_API = os.environ.get("DIGGR_API", "http://127.0.0.1:6660")
+LOG_FILE_EXT = "yaml"
+
 DATASETS_DIR = "lemongrab_datasets"
 COMPANY_NETWORKS_DIR = "company_networks"
 WIKIDATA_MAPPING_FILENAME = "wikidata_mapping.json"

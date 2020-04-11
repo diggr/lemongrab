@@ -10,6 +10,7 @@ from pathlib import Path
 from provit import Provenance
 from .settings import (
     COMPANY_NETWORKS_DIR,
+    LOG_FILE_EXT,
     NETWORK_PROV_ACTIVITY,
     NETWORK_PROV_DESC,
     PROV_AGENT
@@ -46,7 +47,8 @@ class CompanyNetworkBuilder:
         countries=None,
         platform=None,
         roles=False,
-        publisher=False
+        publisher=False,
+        log_file_extension=LOG_FILE_EXT,
     ):
 
         self.roles = roles
@@ -55,6 +57,7 @@ class CompanyNetworkBuilder:
         self.publisher = publisher
         self.gamelist_file = gamelist
 
+        self.log_file_extension = log_file_ext
     def build(self):
 
         g = nx.Graph()
@@ -179,7 +182,7 @@ class CompanyNetworkBuilder:
             "games" : n_games
         }
 
-        with open(f"{out_file}_log.yaml", "w") as outfile:
+        with open(f"{out_file}_log.{self.log_file_ext}", "w") as outfile:
             yaml.dump(log, outfile)
 
 

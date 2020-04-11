@@ -17,6 +17,7 @@ from .settings import (
     ID_2_SLUG_PATH,
 )
 from shutil import copyfile
+from .utils import build_aggregated_logs
 
 company_dataset_present = True
 try:
@@ -134,3 +135,13 @@ def game_company_sample_network(out, game_company_sample):
         out_folder.mkdir(parents=True)
     scn = SampleCompanyNetwork(json.load(game_company_sample))
     scn.build_network().save_network(out)
+
+@cli.command()
+@click.option("--out", default="lemongrab_logs.csv")
+def aggregate_logs(out):
+    outfilename, used_logs = build_aggregated_logs(out)
+    print(f"Aggregates logs saved as: {outfilename}")
+    print(f"Used log files:")
+    for logfilename in used_logs:
+        print(f"\t{logfilename}")
+
