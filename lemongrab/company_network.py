@@ -166,12 +166,22 @@ class CompanyNetworkBuilder:
         return out_file, len(g.nodes), len(g.edges), len(all_games)
 
     def _write_log(self, out_file, n_nodes, n_edges, n_games):
+        """
+        Write the parameters and results into a logfile.
+        """
+        log = {
+            "countries": list(self.countries),
+            "platform": self.platform,
+            "roles": self.roles,
+            "publisher": self.publisher,
+            "nodes" : n_nodes,
+            "edges" : n_edges,
+            "games" : n_games
+        }
+
         with open(f"{out_file}_log.yaml", "w") as outfile:
-            yaml.dump({
-                "nodes" : n_nodes,
-                "edges" : n_edges,
-                "games" : n_games
-            }, outfile)
+            yaml.dump(log, outfile)
+
 
     def company_ids(self, company_id, games):
         """
