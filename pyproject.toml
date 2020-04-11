@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "lemongrab"
+version = "0.1.0"
+description = "Gather company data from mobygames and wikidata and build awesome research datasets and visualizations."
+authors = ["Florian Rämisch <raemisch@ub.uni-leipzig.de>", "Peter Mühleder <muehleder@saw-leipzig.de>"]
+license = "GPL-3.0"
+
+[tool.poetry.scripts]
+lemongrab = "lemongrab.cli:cli"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+tqdm = "^4.45.0"
+requests = "^2.23.0"
+Click = "7.0"
+networkx = "^2.4"
+SPARQLWrapper = "^1.8.5"
+provit = "^1.1.1"
+diggrtoolbox = {git = "https://github.com/diggr/diggrtoolbox", rev = "master"}
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.1"
+pytest-cov = "^2.8.1"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

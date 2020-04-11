@@ -1,50 +1,190 @@
-"""
-Builds a game company network based on the company dataset.
-
-Nodes:  game companies (or game companies and their specific production roles (
-        e.g. "Nintendo_Developed By", and "Nintendo_Published By"))
-Edges:  Number of games both companies worked on (based on their co-appearence in the
-        release information)
-
-Additional node information:
-* label
-* country information based on wikidata dataset
-* num_of_games: number of games the company worked on, within the filtered dataset
-
-
-Filter options:
-
-* countries: resease country (can be multiple)
-* platform (can be multiple)
-
-"""
-
 import networkx as nx
 import json
 import yaml
 import os
-from tqdm import tqdm
+
 from collections import defaultdict
+from .combined_dataset import get_combined_dataset
 from itertools import combinations
 from pathlib import Path
 from provit import Provenance
-
-from .combined_dataset import CompanyDataset
+from .settings import (
+    COMPANY_NETWORKS_DIR,
+    LOG_FILE_EXT,
+    NETWORK_PROV_ACTIVITY,
+    NETWORK_PROV_DESC,
+    PROV_AGENT
+)
 from .utils import load_gamelist
-
-OUT_DIR = "company_networks"
-
-COMPANY_DATASET = "datasets/mobygames_companies.json"
-WIKIDATA_MAPPING = "datasets/wikidata_mapping.json"
-ID_2_SLUG = "datasets/mobygames_companies_id_to_slug.json"
-
-# provenance infomration
-PROV_AGENT = "lemongrab.py"
-PROV_ACTIVITY = "build_company_network"
-PROV_DESC = "Company graph containing all companies for platforms {platforms} and release countries {countries}"
+from tqdm import tqdm
 
 
 class CompanyNetworkBuilder:
+    """
+    Builds a game company network based on the company dataset.
+
+    Nodes:  game companies (or game companies and their specific production roles (
+            e.g. "Nintendo_Developed By", and "Nintendo_Published By"))
+    Edges:  Number of games both companies worked on (based on their co-appearence in the
+            release information)
+
+    Additional node information:
+    * label
+    * country information based on wikidata dataset
+    * num_of_games: number of games the company worked on, within the filtered dataset
+
+
+    Filter options:
+
+    * countries: resease country (can be multiple)
+    * platform (can be multiple)
+
+    """
+
+    def __init__(
+        self,
+        gamelist=None,
+        countries=None,
+        platform=None,
+        roles=False,
+        publisher=False,
+        log_file_extension=LOG_FILE_EXT,
+    ):
+
+        self.roles = roles
+        self.countries = countries
+        self.platform = platform
+        self.publisher = publisher
+        self.gamelist_file = gamelist
+
+        self.log_file_extension = log_file_ext
+    def build(self):
+
+        g = nx.Graph()
+        all_games = set()
+
+        games = {}
+
+        self.dataset = get_combined_dataset()
+        if not self.gamelist_file:
+            self.dataset.set_filter([self.platform], self.countries)
+        else:
+            gamelist = load_gamelist(self.gamelist_file)
+            self.dataset.set_gamelist_filter(gamelist)
+
+        company_list = []
+        for company_id, production_roles in self.dataset.filtered_dataset.items():
+            company_list += self.company_ids(company_id, production_roles)
+
+        for c in company_list:
+            g.add_node(c)
+
+        for c1, c2 in tqdm(combinations(company_list, 2)):
+            if self.roles:
+                c1_id = c1.split("__")[0]
+                c1_role = c1.split("__")[1]
+                c2_id = c2.split("__")[0]
+                c2_role = c2.split("__")[1]
+            else:
+                c1_id = c1
+                c1_role = None
+                c2_id = c2
+                c2_role = None
+
+            if c1 not in games:
+                games[c1] = self._filter_games(
+                    self.dataset.filtered_dataset[c1_id], self.countries, self.platform, c1_role
+                )
+            else:
+                c1_games = games[c1]
+
+            if c2 not in games:
+                games[c2] = self._filter_games(
+                    self.dataset.filtered_dataset[c2_id], self.countries, self.platform, c2_role
+                )
+            else:
+                c2_games = games[c2]
+
+            overlap = games[c1].intersection(games[c2])
+            all_games = all_games.union(overlap)
+
+            if len(overlap) > 0:
+                g.add_edge(c1, c2, weight=len(overlap))
+
+        # add node information
+        for node in g.nodes():
+            id_ = node.split("__")[0]
+            if self.roles:
+                role = node.split("__")[1]
+
+            g.nodes[node]["country"] = self._get_wiki_country(id_)
+            if self.roles:
+                g.nodes[node]["company_name"] = self.dataset.filtered_dataset[id_][0][
+                    "company_name"
+                ]
+                g.nodes[node]["role"] = role
+                g.nodes[node]["label"] = (
+                    self.dataset.filtered_dataset[id_][0]["company_name"]
+                    + "("
+                    + role
+                    + ")"
+                )
+            else:
+                g.nodes[node]["label"] = self.dataset.filtered_dataset[id_][0][
+                    "company_name"
+                ]
+            g.nodes[node]["no_of_games"] = len(games[node])
+
+        out_path = Path(COMPANY_NETWORKS_DIR)
+        out_filename = "company_network_"
+
+        if self.gamelist_file:
+            project_name = self.gamelist_file.split("/")[-1].replace(".yml", "")
+            out_filename += project_name
+        else:
+            out_filename += self.countries_str(self.countries)
+            out_filename += "_" + self.platform_str(self.platform)
+        if self.roles:
+            out_filename += "_roles"
+        if self.publisher:
+            out_filename += "_pub"
+
+        out_filename += ".graphml"
+        out_file = out_path / out_filename
+        nx.write_graphml(g, out_file)
+
+        prov = Provenance(out_file)
+        prov.add(
+            agents=[PROV_AGENT],
+            activity=NETWORK_PROV_ACTIVITY,
+            description=NETWORK_PROV_DESC.format(
+                platforms=self.platform_str(self.platform),
+                countries=self.countries_str(self.countries),
+            ),
+        )
+        prov.save()
+
+        self._write_log(out_file, len(g.nodes), len(g.edges), len(all_games))
+
+        return out_file, len(g.nodes), len(g.edges), len(all_games)
+
+    def _write_log(self, out_file, n_nodes, n_edges, n_games):
+        """
+        Write the parameters and results into a logfile.
+        """
+        log = {
+            "countries": list(self.countries),
+            "platform": self.platform,
+            "roles": self.roles,
+            "publisher": self.publisher,
+            "nodes" : n_nodes,
+            "edges" : n_edges,
+            "games" : n_games
+        }
+
+        with open(f"{out_file}_log.{self.log_file_ext}", "w") as outfile:
+            yaml.dump(log, outfile)
+
 
     def company_ids(self, company_id, games):
         """
@@ -115,122 +255,16 @@ class CompanyNetworkBuilder:
         else:
             return ""
 
-    def __init__(
-        self, gamelist=None, countries=None, platform=None, roles=False, publisher=False
+def build_company_network(
+        gamelist=None,
+        countries=None,
+        platform=None,
+        roles=False,
+        publisher=False
     ):
-
-        self.roles = roles
-        self.publisher = publisher
-        self.gamelist_file = gamelist
-
-        g = nx.Graph()
-        all_games = set()
-
-        print("generating network graph ...")
-        games = {}
-
-        self.dataset = CompanyDataset()
-        if not self.gamelist_file:
-            self.dataset.set_filter([platform], countries)
-        else:
-            gamelist = load_gamelist(self.gamelist_file)
-            self.dataset.set_gamelist_filter(gamelist)
-
-        company_list = []
-        for company_id, production_roles in self.dataset.filtered_dataset.items():
-            company_list += self.company_ids(company_id, production_roles)
-
-        for c in company_list:
-            g.add_node(c)
-
-        for c1, c2 in tqdm(combinations(company_list, 2)):
-            if self.roles:
-                c1_id = c1.split("__")[0]
-                c1_role = c1.split("__")[1]
-                c2_id = c2.split("__")[0]
-                c2_role = c2.split("__")[1]
-            else:
-                c1_id = c1
-                c1_role = None
-                c2_id = c2
-                c2_role = None
-
-            if c1 not in games:
-                games[c1] = self._filter_games(
-                    self.dataset.filtered_dataset[c1_id], countries, platform, c1_role
-                )
-            else:
-                c1_games = games[c1]
-
-            if c2 not in games:
-                games[c2] = self._filter_games(
-                    self.dataset.filtered_dataset[c2_id], countries, platform, c2_role
-                )
-            else:
-                c2_games = games[c2]
-
-            overlap = games[c1].intersection(games[c2])
-            all_games = all_games.union(overlap)
-
-            if len(overlap) > 0:
-                g.add_edge(c1, c2, weight=len(overlap))
-
-        # add node information
-        for node in g.nodes():
-            id_ = node.split("__")[0]
-            if self.roles:
-                role = node.split("__")[1]
-
-            g.nodes[node]["country"] = self._get_wiki_country(id_)
-            if self.roles:
-                g.nodes[node]["company_name"] = self.dataset.filtered_dataset[id_][0][
-                    "company_name"
-                ]
-                g.nodes[node]["role"] = role
-                g.nodes[node]["label"] = (
-                    self.dataset.filtered_dataset[id_][0]["company_name"]
-                    + "("
-                    + role
-                    + ")"
-                )
-            else:
-                g.nodes[node]["label"] = self.dataset.filtered_dataset[id_][0][
-                    "company_name"
-                ]
-            g.nodes[node]["no_of_games"] = len(games[node])
-
-        out_path = Path(OUT_DIR)
-        if not out_path.is_dir():
-            out_path.mkdir()
-        out_filename = "company_network_"
-
-        if self.gamelist_file:
-            project_name = self.gamelist_file.split("/")[-1].replace(".yml", "")
-            out_filename += project_name
-        else:
-            out_filename += self.countries_str(countries)
-            out_filename += "_" + self.platform_str(platform)
-        if self.roles:
-            out_filename += "_roles"
-        if self.publisher:
-            out_filename += "_pub"
-        out_filename += ".graphml"
-
-        out_file = out_path / out_filename
-
-        print("\nNetwork file saved as: {}n".format(out_file))
-        nx.write_graphml(g, out_file)
-        print("Nodes in network: {}".format(len(g.nodes)))
-        print("Edges in network: {}".format(len(g.edges)))
-        print("Games: {}".format(len(all_games)))
-
-        prov = Provenance(out_file)
-        prov.add(
-            agents=[PROV_AGENT],
-            activity=PROV_ACTIVITY,
-            description=PROV_DESC.format(
-                platforms=self.platform_str(platform),
-                countries=self.countries_str(countries),
-            ),
-        )
-        prov.save()
+    """
+    CompanyNetworkBuilder factory which runs the build
+    and returns stats about the result.
+    """
+    cn_builder = CompanyNetworkBuilder(gamelist, countries, platform, roles, publisher)
+    return cn_builder.build()

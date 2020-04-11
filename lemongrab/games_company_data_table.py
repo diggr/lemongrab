@@ -1,29 +1,22 @@
 import json
 import yaml
 import os
-from tqdm import tqdm
+
 from collections import defaultdict
+from .combined_dataset import get_combined_dataset
 from itertools import combinations
 from provit import Provenance
-
-COMPANY_DATASET = "datasets/mobygames_companies.json"
-WIKIDATA_MAPPING = "datasets/wikidata_mapping.json"
-ID_2_SLUG = "datasets/mobygames_companies_id_to_slug.json"
-
+from tqdm import tqdm
+from .utils import read_yaml, get_datasets
 
 class GamesDataTableBuilder:
-    def _load_gamelist(self, gamelist_file):
-        with open(gamelist_file) as f:
-            games = yaml.safe_load(f)
-        return games
+
+    def __init__(self, gamelist_filename):
+        self.gamelist = read_yaml(gamelist_filename)
+        self._load_company_dataset()
 
     def _load_company_dataset(self):
-        with open(COMPANY_DATASET) as f:
-            dataset = json.load(f)
-        with open(WIKIDATA_MAPPING) as f:
-            wiki = json.load(f)
-        with open(ID_2_SLUG) as f:
-            id_2_slug = json.load(f)
+        dataset, id_2_slug, wiki = get_datasets()
 
         id_2_slug_map = {x["company_id"]: x["slug"] for x in id_2_slug}
         wiki_map = {x["mobygames_slug"]: x for x in wiki}
@@ -53,12 +46,4 @@ class GamesDataTableBuilder:
 
         return {"platforms": list(platforms), "companies": companies_dataset}
 
-    def __init__(self, gamelist):
-        self.gamelist = self._load_gamelist(gamelist)
-        self._load_company_dataset()
 
-        for title, links in self.gamelist.items():
-            data = self._get_data(links["mobygames"])
-
-            print(data)
-            break

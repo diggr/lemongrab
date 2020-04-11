@@ -15,9 +15,17 @@ ENTRY = "/{dataset}/{id}"
 
 
 class DiggrApi:
+    """
+    Wrapper around the unifiedAPI by diggr.
+    """
+
+    def __init__(self, base_url):
+        self.session = requests.Session()
+        self.base_url = base_url
+
     def _call(self, url):
         try:
-            rsp = requests.get(url)
+            rsp = self.session.get(url)
             data = rsp.json()
             return data
         except:
@@ -52,5 +60,4 @@ class DiggrApi:
             print("couldn't retrieve mobygames id for slug {}".format(slug))
             return None
 
-    def __init__(self, base_url):
-        self.base_url = base_url
+

@@ -10,39 +10,71 @@ datasets and visualizations.This tool provides various commands to fetch data
 * [unified api](https://git.sc.uni-leipzig.de/ubl/diggr/infrastructure/unifiedapi)
 * [diggrtoolbox](https://github.com/diggr/diggrtoolbox)
 
+## Prerequisites
+
+It is recommended to install *lemongrab* in a virtual Python environment such as
+Pipenv, virtualenv, or venv.
+
 ## Installation
 
-Clone this repository and install the requirements
+Clone this repository and install the package.
 
 ```zsh
-$ git clone https://git.sc.uni-leipzig.de/ubl/diggr/general/lemonggrab
-$ cd lemongrab && pip install -r requirements.txt
+$ git clone https://git.sc.uni-leipzig.de/ubl/diggr/general/lemongrab
+$ cd lemongrab
 ```
+
+Open *lemongrab/settings.py* with an editor of your choice and edit the value
+of *DIGGR_API* to the address of your instance of the *UnifiedAPI*. Save the file
+and install lemongrab.
+
+```
+$ pip install .
+```
+
+## Initial setup / Create a project
+
+Create a folder and initialize lemongrab.
+
+```zsh
+$ mkdir testproject && cd testproject
+$ lemongrab init
+```
+
+This will create two directories, one for the company\_networks and on one for the
+required datasets. Next: Create both the wikidata mapping and the mobygames companies
+dataset by running:
+
+```zsh
+$ lemongrab build all
+```
+
+Note: If you already build the datasets somewhere else, you can copy those files into 
+the *lemongrab_datasets* directory and save yourself some time.
 
 ## Features
 
-The tool provides the following commands, which are intended to be used in the 
-following order. The first two commands (*company-dataset* and *wikidata-mapping*)
-generate/fetch the dataset and the mapping. The third command (*company-network*)
-builds a *GraphML* file to be inspected (e.g. with *Gephi*). The fourth command
-(*browser*) starts a web application which can be used to inspect the companies 
+The tool provides two main commands *company-network* and *browser*. The first
+command builds a *GraphML* file to be inspected (e.g. with *Gephi*). The second 
+command starts a web application which can be used to inspect the companies 
 fetched earlier.
 
-## Usage
-
-Commands:
-
 ```zsh
-$ python lemongrab.py <COMMAND>
+$ lemongrab company-network -c "Japan" -p "Sony PlayStation" --roles
+$ lemongrab browser
 ```
 
-### `company-dataset`
+Every company network is supplied with a log file. To aggreate all logs of your project
+simply invoke the *aggregate-logs* command.
 
-Builds base company dataset with game/release/production role information
+```zsh
+$ lemongrab aggregate-logs
+```
 
-### `wikidata-mapping`
+This will build a CSV file in your project directory with the contents of all log files
+in your current project.
 
-Fetches current wikidata mapping (Q-Number <-> Mobygames slug) and country information
+## Usage
 
 ### `company-network`
 
@@ -61,7 +93,7 @@ You can either filter by Country/Platform OR tulpa gamelist.
 Options which allow multiple invokation (currently country and platform) can be used multiple times in the same call, e.g.:
 
 ```zsh
-$ python lemongrab.py company-network -c Japan -c Worldwide
+$ lemongrab company-network -c Japan -c Worldwide
 ```
 
 ### `game-company-sample-network`
@@ -69,7 +101,7 @@ $ python lemongrab.py company-network -c Japan -c Worldwide
 Builds a network of companies based on a tulpa generated company sample.
 
 ```zsh
-$ python lemongrab.py game-company-sample-network ../tulpaproject/datasets/tulpa-companies.json
+$ lemongrab game-company-sample-network ../tulpaproject/datasets/tulpa-companies.json
 ```
 
 ### `browser`
@@ -78,9 +110,9 @@ Opens the lemongrab browser frontend for data exploration
 
 ## Datasets
 
-### Company dataset
+### Mobygames companies dataset
 
-`datasets/mobygames_companies.json`
+`lemongrab_datasets/mobygames_companies.json`
 
 This dataset contains all companies and the games they were working on.
 
@@ -115,7 +147,7 @@ This dataset contains all companies and the games they were working on.
 
 ### Wikidata mapping and country information
 
-`datasets/wikidata_mapping.json`
+`lemongrab_datasets/wikidata_mapping.json`
 
 Contains a mapping of Mobygames company slugs to wikidata items as well as country information from 
 wikidata (if available) 
@@ -154,6 +186,11 @@ Mapping of the internal Mobygames company ids to their slug
 
 GPLv3
 
+## Authors
+
+* Peter Mühleder <muehleder@saw-leipzig.de>
+* Florian Rämisch <raemisch@ub.uni-leipzig.de>
+
 ## Copyright
 
-2019 Universitätsbibliothek Leipzig
+2019-2020, Universitätsbibliothek Leipzig, <info@ub.uni-leipzig.de>

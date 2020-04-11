@@ -1,23 +1,26 @@
-"""
-Prepares a company dataset for the lemongrab browser
-
-use:
-
-dataset = CompanyDataset()
-dataset.set_filter(platforms, countries)
-overview = dataset.get_overview()
-"""
-
 import json
+
 from tqdm import tqdm
 from collections import Counter, defaultdict
+from .utils import get_datasets
 
-BASE_DATASET = "datasets/mobygames_companies.json"
-SLUG_MAPPING = "datasets/mobygames_companies_id_to_slug.json"
-WIKI_MAPPING = "datasets/wikidata_mapping.json"
+class CombinedDataset:
+    """
+    Prepares a company dataset for the lemongrab browser
 
+    Use the factory get_combined_dataset to inistanciate!
+    dataset = get_combined_dataset()
+    dataset.set_filter(platforms, countries)
+    overview = dataset.get_overview()
+    """
+    def __init__(self, mobygames_companies, id_2_slug, wikidata_mapping):
+        self.base_dataset = mobygames_companies
+        self.slug_map = {x["company_id"]: x["slug"] for x in id_2_slug}
+        self.country_map = {
+            x["mobygames_slug"]: x["country"] for x in wikidata_mapping if x["country"]
+        }
+        self.setup_data()
 
-class CompanyDataset:
     def get_company_data(self, company_name):
         pass
 
@@ -134,19 +137,10 @@ class CompanyDataset:
         self.platforms = sorted(list(self.platforms))
         self.countries = sorted(list(self.countries))
 
-    def __init__(self, base_dataset=BASE_DATASET, slug_mapping=SLUG_MAPPING,
-            wiki_mapping=WIKI_MAPPING):
-        with open(base_dataset) as f:
-            self.base_dataset = json.load(f)
 
-        with open(slug_mapping) as f:
-            data = json.load(f)
-        self.slug_map = {x["company_id"]: x["slug"] for x in data}
-
-        with open(wiki_mapping) as f:
-            data = json.load(f)
-        self.country_map = {
-            x["mobygames_slug"]: x["country"] for x in data if x["country"]
-        }
-
-        self.setup_data()
+def get_combined_dataset():
+    """
+    Factory which returns an instance of CombinedDataset.
+    """
+    mobygames_companies, id_2_slug, wikidata_mapping = get_datasets()
+    return CombinedDataset(mobygames_companies, id_2_slug, wikidata_mapping)

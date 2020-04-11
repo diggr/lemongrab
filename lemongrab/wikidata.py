@@ -1,38 +1,36 @@
-"""
-Builds a local dataset with country information of all videogame companies
-with a mobygames id in wikidata. 
-"""
-
-from SPARQLWrapper import SPARQLWrapper, JSON
-from provit import Provenance
 import json
 
-SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
-QUERY = """
-SELECT ?item ?itemLabel ?countryLabel ?companyId
-{
-  ?item wdt:P4773 ?companyId. 
-  OPTIONAL { ?item wdt:P17 ?country. }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-"""
-
-MAPPING_FILE = "datasets/wikidata_mapping.json"
-
-PROV_AGENT = "lemongrab.py"
-PROV_ACTIVITY = "build_wikidata_mapping"
-PROV_DESC = "Contains all items in Wikidata with a Mobygames Company ID (P4773) an their country information"
-
+from SPARQLWrapper import SPARQLWrapper, JSON
+from pathlib import Path
+from provit import Provenance
+from .settings import (
+    DATASETS_DIR,
+    SPARQL_ENDPOINT,
+    SPARQL_QUERY,
+    SPARQL_AGENT,
+    PROV_AGENT,
+    WIKIDATA_MAPPING_FILENAME,
+    WIKIDATA_PROV_ACTIVITY,
+    WIKIDATA_PROV_DESC,
+)
+from urllib.error import URLError
 
 def build_wikidata_mapping():
+    """
+    Fetches all wikidata items with a mobygames company ID.
+    Result is saved as JSON to DATASETS_DIR / WIKIDATA_MAPPING_FILENAME.
+    """
     sparql = SPARQLWrapper(
         SPARQL_ENDPOINT,
-        agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+        agent=SPARQL_AGENT,
     )
 
-    sparql.setQuery(QUERY)
+    sparql.setQuery(SPARQL_QUERY)
     sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()
+    try:
+        results = sparql.query().convert()
+    except URLError:
+        raise RuntimeError("Error while fetching data from wikidata... No file written!")
 
     dataset = []
     for binding in results["results"]["bindings"]:
@@ -48,14 +46,18 @@ def build_wikidata_mapping():
             }
         )
 
-    print("Wikidata items with Mobygames Company ID: {}".format(len(dataset)))
-
-    with open(MAPPING_FILE, "w") as f:
+    mapping_filename = Path(DATASETS_DIR) / WIKIDATA_MAPPING_FILENAME
+    with open(mapping_filename, "w") as f:
         json.dump(dataset, f, indent=4)
 
-    prov = Provenance(MAPPING_FILE, overwrite=True)
-    prov.add(agents=[PROV_AGENT], activity=PROV_ACTIVITY, description=PROV_DESC)
+    prov = Provenance(mapping_filename, overwrite=True)
+    prov.add(
+        agents=[PROV_AGENT],
+        activity=WIKIDATA_PROV_ACTIVITY,
+        description=WIKIDATA_PROV_DESC
+    )
     prov.add_primary_source("wikidata")
     prov.save()
 
-    print("\nMapping file saved as: {}".format(MAPPING_FILE))
+
+    return len(dataset), mapping_filename

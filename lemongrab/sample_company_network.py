@@ -5,12 +5,16 @@ company sample.
 
 import networkx as nx
 
-from .combined_dataset import CompanyDataset
-from .company_network import PROV_AGENT, PROV_ACTIVITY
+from .combined_dataset import get_combined_dataset
 from dataclasses import dataclass
 from itertools import combinations
 from pprint import pprint
 from provit import Provenance
+from .settings import (
+    PROV_AGENT,
+    SAMPLE_PROV_ACTIVITY,
+    SAMPLE_PROV_DESC
+)
 from tqdm import tqdm
 from typing import List
 
@@ -43,7 +47,7 @@ def get_wiki_country(c_id, company_dataset, none_return="undefined"):
 class SampleCompanyNetwork:
 
     def __init__(self, game_company_sample):
-        self.company_dataset = CompanyDataset()
+        self.company_dataset = get_combined_dataset()
         self.games = list(game_company_sample.keys())
         self.companies = [Company(**c) for g in game_company_sample.values() for c in g]
         self.graph = nx.Graph()
@@ -92,7 +96,7 @@ class SampleCompanyNetwork:
         prov = Provenance(outfilename)
         prov.add(
             agents = [PROV_AGENT],
-            activity = PROV_ACTIVITY,
-            description = "Build company network based on tulpa exported sample"
+            activity = SAMPLE_PROV_ACTIVITY,
+            description = SAMPLE_PROV_DESC
         )
         prov.save()
