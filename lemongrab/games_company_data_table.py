@@ -1,16 +1,8 @@
-import json
-import yaml
-import os
-
 from collections import defaultdict
-from .combined_dataset import get_combined_dataset
-from itertools import combinations
-from provit import Provenance
-from tqdm import tqdm
 from .utils import read_yaml, get_datasets
 
-class GamesDataTableBuilder:
 
+class GamesDataTableBuilder:
     def __init__(self, gamelist_filename):
         self.gamelist = read_yaml(gamelist_filename)
         self._load_company_dataset()
@@ -45,5 +37,3 @@ class GamesDataTableBuilder:
                     platforms.add(entry["platform"])
 
         return {"platforms": list(platforms), "companies": companies_dataset}
-
-

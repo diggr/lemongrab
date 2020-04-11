@@ -28,7 +28,7 @@ class DiggrApi:
             rsp = self.session.get(url)
             data = rsp.json()
             return data
-        except:
+        except Exception:
             print("invalid api call: {}".format(url))
             return None
 
@@ -48,7 +48,7 @@ class DiggrApi:
         data = self._call(self.base_url + ENTRY.format(dataset=dataset, id=id_))
         try:
             return data["entry"]
-        except:
+        except Exception:
             print("no data available for {}/{}".format(dataset, id_))
             return None
 
@@ -56,8 +56,6 @@ class DiggrApi:
         data = self._call(self.base_url + MG_BY_SLUG.format(slug=slug))
         try:
             return data["entry"]["id"]
-        except:
+        except Exception:
             print("couldn't retrieve mobygames id for slug {}".format(slug))
             return None
-
-

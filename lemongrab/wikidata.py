@@ -15,22 +15,22 @@ from .settings import (
 )
 from urllib.error import URLError
 
+
 def build_wikidata_mapping():
     """
     Fetches all wikidata items with a mobygames company ID.
     Result is saved as JSON to DATASETS_DIR / WIKIDATA_MAPPING_FILENAME.
     """
-    sparql = SPARQLWrapper(
-        SPARQL_ENDPOINT,
-        agent=SPARQL_AGENT,
-    )
+    sparql = SPARQLWrapper(SPARQL_ENDPOINT, agent=SPARQL_AGENT,)
 
     sparql.setQuery(SPARQL_QUERY)
     sparql.setReturnFormat(JSON)
     try:
         results = sparql.query().convert()
     except URLError:
-        raise RuntimeError("Error while fetching data from wikidata... No file written!")
+        raise RuntimeError(
+            "Error while fetching data from wikidata... No file written!"
+        )
 
     dataset = []
     for binding in results["results"]["bindings"]:
@@ -54,10 +54,9 @@ def build_wikidata_mapping():
     prov.add(
         agents=[PROV_AGENT],
         activity=WIKIDATA_PROV_ACTIVITY,
-        description=WIKIDATA_PROV_DESC
+        description=WIKIDATA_PROV_DESC,
     )
     prov.add_primary_source("wikidata")
     prov.save()
-
 
     return len(dataset), mapping_filename

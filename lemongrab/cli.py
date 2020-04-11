@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import click
 import json
-import yaml
 import sys
 
 from .wikidata import build_wikidata_mapping
@@ -24,6 +23,7 @@ try:
     from lemongrab.browser import start_browser
 except FileNotFoundError:
     company_dataset_present = False
+
 
 @click.group()
 def cli():
@@ -53,6 +53,7 @@ def build():
     Build the datasets required for analysis.
     """
 
+
 @build.command()
 def wikidata_mapping():
     """
@@ -70,7 +71,9 @@ def wikidata_mapping():
 
 
 @build.command()
-@click.option("--unified-api-url", default=DIGGR_API, help="URL of any UnifiedAPI instance")
+@click.option(
+    "--unified-api-url", default=DIGGR_API, help="URL of any UnifiedAPI instance"
+)
 def mobygames_companies(unified_api_url):
     """
     Build new company dataset from the Mobygames dataset
@@ -81,7 +84,9 @@ def mobygames_companies(unified_api_url):
 
 
 @build.command()
-@click.option("--unified-api-url", default=DIGGR_API, help="URL of any UnifiedAPI instance")
+@click.option(
+    "--unified-api-url", default=DIGGR_API, help="URL of any UnifiedAPI instance"
+)
 @click.pass_context
 def all(ctx, unified_api_url):
     """
@@ -122,11 +127,7 @@ def company_network(gamelist, country, platform, roles, publisher):
     """
     print("Building company network...")
     out_file, n_nodes, n_edges, n_games = build_company_network(
-        gamelist,
-        country,
-        platform,
-        roles,
-        publisher
+        gamelist, country, platform, roles, publisher
     )
     print(f"Network file saved as: {out_file}")
     print(f"Nodes in network: {n_nodes}")
@@ -147,6 +148,7 @@ def game_company_sample_network(out, game_company_sample):
     scn = SampleCompanyNetwork(json.load(game_company_sample))
     scn.build_network().save_network(out)
 
+
 @cli.command()
 @click.option("--out", default="lemongrab_logs.csv")
 def aggregate_logs(out):
@@ -158,4 +160,3 @@ def aggregate_logs(out):
     print(f"Used log files:")
     for logfilename in used_logs:
         print(f"\t{logfilename}")
-

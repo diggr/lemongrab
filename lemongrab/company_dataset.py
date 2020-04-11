@@ -73,7 +73,7 @@ def build_mobygames_companies(unified_api_url=DIGGR_API):
     prov.add(
         agents=[PROV_AGENT],
         activity=COMPANIES_PROV_ACTIVITY,
-        description=COMPANIES_PROV_DESC
+        description=COMPANIES_PROV_DESC,
     )
     prov.add_primary_source("mobygames")
     prov.add_primary_source("diggr_platform_mapping")

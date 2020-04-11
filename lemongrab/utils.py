@@ -9,14 +9,14 @@ from .settings import (
     LOG_FILE_EXT,
     ID_2_SLUG_FILENAME,
     MOBYGAMES_COMPANIES_FILENAME,
-    WIKIDATA_MAPPING_FILENAME
+    WIKIDATA_MAPPING_FILENAME,
 )
 
 
 def write_json(data, outfilename):
     with open(outfilename, "w") as outfile:
         json.dump(data, outfile, indent=4)
-    return filename
+    return outfilename
 
 
 def read_json(infilename):
@@ -49,25 +49,25 @@ def load_gamelist(gamelist_file):
             gamelist.append(mg_slug)
 
     return gamelist
-with open('eggs.csv', 'w', newline='') as csvfile:
-    spamwriter = csv.writer(csvfile, delimiter=' ',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+
+with open("eggs.csv", "w", newline="") as csvfile:
+    spamwriter = csv.writer(
+        csvfile, delimiter=" ", quotechar="|", quoting=csv.QUOTE_MINIMAL
+    )
+
+
 def build_aggregated_logs(
-        outfilename,
-        company_networks_dir=COMPANY_NETWORKS_DIR,
-        log_file_ext=LOG_FILE_EXT
-    ):
+    outfilename, company_networks_dir=COMPANY_NETWORKS_DIR, log_file_ext=LOG_FILE_EXT
+):
     """
     Aggregates all logs from the company_networks directory into a single csv.
     """
     cn_path = Path(company_networks_dir)
     used_logs = []
-    with open(outfilename, 'w', newline='') as csvfile:
+    with open(outfilename, "w", newline="") as csvfile:
         logwriter_csv = csv.writer(
-            csvfile,
-            delimiter=';',
-            quotechar='"',
-            quoting=csv.QUOTE_MINIMAL
+            csvfile, delimiter=";", quotechar='"', quoting=csv.QUOTE_MINIMAL
         )
         header_written = False
         for logfilename in cn_path.glob(f"*.{log_file_ext}"):

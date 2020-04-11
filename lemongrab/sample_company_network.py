@@ -8,13 +8,8 @@ import networkx as nx
 from .combined_dataset import get_combined_dataset
 from dataclasses import dataclass
 from itertools import combinations
-from pprint import pprint
 from provit import Provenance
-from .settings import (
-    PROV_AGENT,
-    SAMPLE_PROV_ACTIVITY,
-    SAMPLE_PROV_DESC
-)
+from .settings import PROV_AGENT, SAMPLE_PROV_ACTIVITY, SAMPLE_PROV_DESC
 from tqdm import tqdm
 from typing import List
 
@@ -26,8 +21,8 @@ class Company:
     company_name: str
     role: str
     release_countries: List[str]
-    platform : str
-    game_slug : str
+    platform: str
+    game_slug: str
 
 
 def get_wiki_country(c_id, company_dataset, none_return="undefined"):
@@ -45,7 +40,6 @@ def get_wiki_country(c_id, company_dataset, none_return="undefined"):
 
 
 class SampleCompanyNetwork:
-
     def __init__(self, game_company_sample):
         self.company_dataset = get_combined_dataset()
         self.games = list(game_company_sample.keys())
@@ -67,9 +61,10 @@ class SampleCompanyNetwork:
             self.graph.add_node(c_id)
             self.graph.nodes[c_id]["role"] = c.role
             self.graph.nodes[c_id]["platform"] = c.platform
-            self.graph.nodes[c_id]["country"] = get_wiki_country(c_id, self.company_dataset)
+            self.graph.nodes[c_id]["country"] = get_wiki_country(
+                c_id, self.company_dataset
+            )
             self.graph.nodes[c_id]["name"] = c.company_name
-
 
         for c1, c2 in tqdm(combinations(self.companies, 2)):
             c1_games = set(self._filter_games(c1))
@@ -95,8 +90,8 @@ class SampleCompanyNetwork:
     def _write_prov(self, outfilename):
         prov = Provenance(outfilename)
         prov.add(
-            agents = [PROV_AGENT],
-            activity = SAMPLE_PROV_ACTIVITY,
-            description = SAMPLE_PROV_DESC
+            agents=[PROV_AGENT],
+            activity=SAMPLE_PROV_ACTIVITY,
+            description=SAMPLE_PROV_DESC,
         )
         prov.save()

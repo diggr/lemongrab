@@ -1,9 +1,6 @@
 import networkx as nx
-import json
 import yaml
-import os
 
-from collections import defaultdict
 from .combined_dataset import get_combined_dataset
 from itertools import combinations
 from pathlib import Path
@@ -13,7 +10,7 @@ from .settings import (
     LOG_FILE_EXT,
     NETWORK_PROV_ACTIVITY,
     NETWORK_PROV_DESC,
-    PROV_AGENT
+    PROV_AGENT,
 )
 from .utils import load_gamelist
 from tqdm import tqdm
@@ -48,7 +45,7 @@ class CompanyNetworkBuilder:
         platform=None,
         roles=False,
         publisher=False,
-        log_file_extension=LOG_FILE_EXT,
+        log_file_ext=LOG_FILE_EXT,
     ):
 
         self.roles = roles
@@ -58,6 +55,7 @@ class CompanyNetworkBuilder:
         self.gamelist_file = gamelist
 
         self.log_file_extension = log_file_ext
+
     def build(self):
 
         g = nx.Graph()
@@ -93,17 +91,19 @@ class CompanyNetworkBuilder:
 
             if c1 not in games:
                 games[c1] = self._filter_games(
-                    self.dataset.filtered_dataset[c1_id], self.countries, self.platform, c1_role
+                    self.dataset.filtered_dataset[c1_id],
+                    self.countries,
+                    self.platform,
+                    c1_role,
                 )
-            else:
-                c1_games = games[c1]
 
             if c2 not in games:
                 games[c2] = self._filter_games(
-                    self.dataset.filtered_dataset[c2_id], self.countries, self.platform, c2_role
+                    self.dataset.filtered_dataset[c2_id],
+                    self.countries,
+                    self.platform,
+                    c2_role,
                 )
-            else:
-                c2_games = games[c2]
 
             overlap = games[c1].intersection(games[c2])
             all_games = all_games.union(overlap)
@@ -177,14 +177,13 @@ class CompanyNetworkBuilder:
             "platform": self.platform,
             "roles": self.roles,
             "publisher": self.publisher,
-            "nodes" : n_nodes,
-            "edges" : n_edges,
-            "games" : n_games
+            "nodes": n_nodes,
+            "edges": n_edges,
+            "games": n_games,
         }
 
         with open(f"{out_file}_log.{self.log_file_ext}", "w") as outfile:
             yaml.dump(log, outfile)
-
 
     def company_ids(self, company_id, games):
         """
@@ -208,7 +207,8 @@ class CompanyNetworkBuilder:
 
     def _filter_games(self, ds, countries, platform, role):
         """
-        Returns a list of all games a company worked on based on filter criterias countries, platform and role
+        Returns a list of all games a company worked on based on filter criterias countries,
+        platform and role
         """
         if countries:
             ds = [
@@ -255,13 +255,10 @@ class CompanyNetworkBuilder:
         else:
             return ""
 
+
 def build_company_network(
-        gamelist=None,
-        countries=None,
-        platform=None,
-        roles=False,
-        publisher=False
-    ):
+    gamelist=None, countries=None, platform=None, roles=False, publisher=False
+):
     """
     CompanyNetworkBuilder factory which runs the build
     and returns stats about the result.

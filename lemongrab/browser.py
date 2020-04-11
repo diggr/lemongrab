@@ -6,13 +6,10 @@ import time
 import webbrowser
 
 from multiprocessing import Process
-from flask_cors import CORS, cross_origin
-from flask import Flask, jsonify, render_template, request
+from flask_cors import CORS
+from flask import Flask, render_template, request
 from .combined_dataset import get_combined_dataset
-from .settings import (
-    BROWSER_DEBUG,
-    BROWSER_PORT
-)
+from .settings import BROWSER_DEBUG, BROWSER_PORT
 from .utils import load_gamelist
 
 app = Flask(__name__)
@@ -44,7 +41,7 @@ def analysis():
 
     try:
         companies_ratio = data["companies_with_country"] / len(data["companies"])
-    except:
+    except Exception:
         companies_ratio = 0
 
     return render_template(
@@ -74,7 +71,7 @@ def start_backend():
         app.run(debug=BROWSER_DEBUG, port=BROWSER_PORT, use_reloader=False)
     except OSError as e:
         print("Cannot start provis server.")
-        sys.exit(1)
+        sys.exit(e)
 
 
 def start_webbrowser():
