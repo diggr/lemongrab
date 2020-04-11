@@ -51,12 +51,6 @@ def load_gamelist(gamelist_file):
     return gamelist
 
 
-with open("eggs.csv", "w", newline="") as csvfile:
-    spamwriter = csv.writer(
-        csvfile, delimiter=" ", quotechar="|", quoting=csv.QUOTE_MINIMAL
-    )
-
-
 def build_aggregated_logs(
     outfilename, company_networks_dir=COMPANY_NETWORKS_DIR, log_file_ext=LOG_FILE_EXT
 ):
