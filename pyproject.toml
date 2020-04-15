@@ -16,7 +16,7 @@ Click = "7.0"
 networkx = "^2.4"
 SPARQLWrapper = "^1.8.5"
 provit = "^1.1.1"
-diggrtoolbox = {git = "https://github.com/diggr/diggrtoolbox", rev = "master"}
+diggrtoolbox = {git = "https://github.com/diggr/diggrtoolbox", rev = "v0.4.1"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.1"
