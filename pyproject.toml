@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lemongrab"
-version = "0.1.0"
+version = "0.1.1"
 description = "Gather company data from mobygames and wikidata and build awesome research datasets and visualizations."
 authors = ["Florian Rämisch <raemisch@ub.uni-leipzig.de>", "Peter Mühleder <muehleder@saw-leipzig.de>"]
 license = "GPL-3.0"
