@@ -54,7 +54,7 @@ class CompanyNetworkBuilder:
         self.publisher = publisher
         self.gamelist_file = gamelist
 
-        self.log_file_extension = log_file_ext
+        self.log_file_ext = log_file_ext
 
     def build(self):
 
