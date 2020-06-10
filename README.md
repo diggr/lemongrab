@@ -4,6 +4,8 @@ Gather company data from mobygames and wikidata and build awesome research
 datasets and visualizations.This tool provides various commands to fetch data 
 (via cli) and visualize it (via browser).
 
+![lemongrab logo](assets/lemongrab_header.png?raw=true "lemongrab")
+
 ## Requirements
 
 * Python 3.7
